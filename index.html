@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>별빛 타로 도감</title>
+<meta name="description" content="고민을 떠올리고 타로 카드를 뽑아 보세요. 점술사 부엉이 모리가 풀이해 주고, 희귀한 전설 카드를 모아 도감을 완성할 수 있어요.">
+<meta property="og:title" content="별빛 타로 도감">
+<meta property="og:description" content="오늘의 타로 카드를 뽑고 전설 카드를 모아 보세요!">
+<meta name="theme-color" content="#0d1226">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d1226'/%3E%3Cpath d='M32 8l6 18h18l-14 11 5 18-15-11-15 11 5-18L8 26h18z' fill='%23e7c37a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 레이아웃: 휴대폰 한 화면 앱. 위에 탭(뽑기/도감), 가운데 무대, 아래 결과 */
+:root{
+  --ink:#0d1226;        /* 밤하늘 배경 */
+  --ink-2:#161d3a;      /* 패널 */
+  --line:#2a3360;       /* 테두리 */
+  --text:#ece8dc;       /* 본문 */
+  --muted:#9aa0bf;      /* 흐린 글씨 */
+  --gold:#e7c37a;       /* 강조 */
+  --r-n:#a9b3c9; --r-r:#5ab0ff; --r-e:#c48bff; --r-l:#ffcf4a;
+  --display:"Gowun Batang", "Nanum Myeongjo", serif;
+  --body:"Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--text);font-family:var(--body);
+  background-image:radial-gradient(1px 1px at 20% 30%,#fff8 50%,transparent 51%),
+  radial-gradient(1px 1px at 70% 15%,#fff6 50%,transparent 51%),
+  radial-gradient(1.5px 1.5px at 85% 60%,#fff5 50%,transparent 51%),
+  radial-gradient(1px 1px at 35% 80%,#fff5 50%,transparent 51%),
+  radial-gradient(1px 1px at 55% 45%,#fff4 50%,transparent 51%);
+  background-attachment:fixed;}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.app{max-width:520px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:14px;min-height:100%}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-size:22px;margin:0;color:var(--gold);letter-spacing:.02em}
+.wallet{display:flex;gap:8px;font-size:13px}
+.chip{background:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:5px 10px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.chip b{color:var(--gold)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:4px}
+.tabs button{background:none;border:0;color:var(--muted);padding:10px;border-radius:9px;font-size:15px;font-weight:500}
+.tabs button[aria-selected="true"]{background:var(--line);color:var(--text)}
+.view[hidden]{display:none}
+
+/* 마스코트 */
+.guide{display:flex;gap:10px;align-items:flex-start}
+.owl{flex:none;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 50% 60%,#2e3a75,#1a2150);border:2px solid var(--gold);overflow:hidden;display:grid;place-items:end center}
+.owl svg{width:58px;height:58px;display:block}
+.owl.hop svg{animation:hop .5s ease}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-6px) rotate(-4deg)}70%{transform:translateY(0) rotate(3deg)}}
+.share-img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+.bubble{background:var(--ink-2);border:1px solid var(--line);border-radius:4px 14px 14px 14px;padding:10px 12px;font-size:14px;line-height:1.55}
+.bubble small{display:block;color:var(--muted);font-size:12px;margin-bottom:2px}
+
+.ask{display:flex;gap:8px}
+.ask input{flex:1;min-width:0;background:var(--ink-2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px 12px;font-size:15px;font-family:inherit}
+.btn{background:var(--gold);color:#1b1630;border:0;border-radius:10px;padding:11px 16px;font-size:15px;font-weight:700}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:none;color:var(--gold);border:1px solid var(--gold)}
+
+/* 무대 */
+.stage{position:relative;min-height:330px;display:grid;place-items:center;padding-bottom:44px}
+.fan{position:relative;width:100%;height:220px}
+.back{position:absolute;left:50%;bottom:0;width:86px;height:136px;margin-left:-43px;border-radius:9px;border:0;padding:0;
+  background:var(--back) center/100% 100% no-repeat,var(--backbg,#151c42);
+  transform-origin:50% 160%;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s;box-shadow:0 6px 16px #0008;
+  --tx:0px;--ty:0px;--rot:0deg;--ry:0deg;--sc:1;--lift:0px;
+  transform:translate(var(--tx),calc(var(--ty) + var(--lift))) rotate(var(--rot)) rotateY(var(--ry)) scale(var(--sc))}
+.back:hover,.back:focus-visible{--lift:-22px}
+.back.chosen{transition:transform .6s cubic-bezier(.3,1.4,.5,1);z-index:5;box-shadow:0 0 30px var(--gold)}
+.back:hover{filter:brightness(1.2)}
+.back.gone{opacity:0;pointer-events:none}
+
+/* 큰 카드 */
+.big{width:200px;height:320px;perspective:1000px;cursor:pointer}
+.big{--rx:0deg;--rt:0deg;--mx:50%;--my:30%;position:relative;touch-action:none}
+.big .float{width:100%;height:100%;transform-style:preserve-3d;animation:bob 3.2s ease-in-out infinite}
+.big .tilt{width:100%;height:100%;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--rt));transition:transform .5s ease}
+.big.tilting .tilt{transition:transform .08s linear}
+.big .inner{position:relative;width:100%;height:100%;transition:transform .8s cubic-bezier(.3,.9,.3,1);transform-style:preserve-3d}
+.big.flipped .inner{transform:rotateY(180deg)}
+.big.spin .inner{transition:transform 1.3s cubic-bezier(.2,.7,.2,1)}
+.big.spin.flipped .inner{transform:rotateY(900deg)}
+.big .face::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;mix-blend-mode:overlay;
+  background:radial-gradient(circle at var(--mx) var(--my),#ffffff88,transparent 45%)}
+.big.enter{animation:enter .55s cubic-bezier(.3,1.5,.5,1) backwards}
+.big.pop .float{animation:pop .5s ease,bob 3.2s ease-in-out .5s infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes enter{from{transform:translateY(-70px) scale(.55) rotate(-10deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.1)}100%{transform:scale(1)}}
+.face{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.face.b{background:var(--back) center/100% 100% no-repeat,var(--backbg,#151c42)}
+.summary{border-left:3px solid var(--gold);padding-left:12px;font-size:16px!important;line-height:1.7;display:-webkit-box;-webkit-line-clamp:10;-webkit-box-orient:vertical;overflow:hidden}
+.summary.wait,#detail.wait{color:var(--muted)}
+.more-btn{align-self:flex-start;background:none;border:0;color:var(--gold);font-size:14px;font-weight:700;padding:4px 0}
+.more{display:flex;flex-direction:column;gap:10px;background:#0f1530;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.more[hidden]{display:none}
+.more p{font-size:14px!important}
+.more dl{margin:0;display:grid;gap:4px;font-size:14px;line-height:1.6}
+.more dt{color:var(--muted);font-size:12px;margin-top:4px}
+.more dd{margin:0}
+.dots::after{content:"";animation:dots 1.2s steps(4) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+.face.f{transform:rotateY(180deg)}
+.big.charge .face.b{animation:shake .12s infinite}
+@keyframes shake{0%{transform:translate(0,0)}25%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,-2px)}}
+.glow{position:absolute;inset:-18px;border-radius:24px;filter:blur(18px);opacity:0;transition:opacity .4s;z-index:-1}
+.hint{position:absolute;bottom:-34px;left:0;right:0;text-align:center;font-size:13px;color:var(--muted)}
+
+/* 카드 앞면 (공통) */
+.card{position:relative;width:100%;height:100%;border-radius:14px;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  background:linear-gradient(170deg,#202a55,#121836);border:3px solid var(--rc);color:var(--text)}
+.card .no{font-family:var(--display);font-size:13px;color:var(--rc);align-self:stretch;display:flex;justify-content:space-between}
+.card .art{flex:1;display:grid;place-items:center;font-size:76px;width:100%;margin:6px 0;border-radius:8px;
+  background:radial-gradient(circle at 50% 45%,color-mix(in srgb,var(--rc) 35%,transparent),transparent 65%)}
+.card .nm{font-family:var(--display);font-weight:700;font-size:20px}
+.card .rk{font-size:11px;letter-spacing:.1em;color:var(--rc);margin-top:2px}
+.card .art.pic{padding:0;background:none;border:1.5px solid color-mix(in srgb,var(--rc) 70%,#000);overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px #0006}
+.card .art.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.card.rev .art.pic img{transform:rotate(180deg)}
+.card .art.pic::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,#0b0f24cc);pointer-events:none}
+.slot.empty .art.pic img{filter:brightness(.12) blur(1.5px)}
+.card.rev .art span{display:inline-block;transform:rotate(180deg)}
+.card.holo::before{content:"";position:absolute;inset:0;border-radius:11px;pointer-events:none;mix-blend-mode:color-dodge;opacity:.55;
+  background:linear-gradient(115deg,transparent 20%,#ff6ad5 35%,#7af 45%,#6fffd2 55%,#ffe66a 65%,transparent 80%);background-size:250% 250%;animation:holo 3s linear infinite}
+@keyframes holo{from{background-position:0% 50%}to{background-position:250% 50%}}
+.r-s{--rc:#5ff2c6} .r-n{--rc:var(--r-n)} .r-r{--rc:var(--r-r)} .r-e{--rc:var(--r-e)} .r-l{--rc:var(--r-l)}
+
+/* 결과 */
+.result{background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.result[hidden]{display:none}
+.result h2{font-family:var(--display);margin:0;font-size:22px;text-wrap:balance}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;border-radius:999px;padding:3px 9px;border:1px solid currentColor}
+.result p{margin:0;line-height:1.7;font-size:15px}
+.result .q{color:var(--muted);font-size:13px}
+.new{color:var(--gold);font-weight:700}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* 확률표 */
+.odds{display:grid;grid-template-columns:repeat(auto-fit,minmax(60px,1fr));gap:6px;font-size:12px;text-align:center}
+.odds div{background:var(--ink-2);border:1px solid var(--line);border-radius:8px;padding:6px 2px;border-top:3px solid var(--rc)}
+.odds b{display:block;color:var(--rc);font-size:13px}
+
+/* 도감 */
+.prog{display:flex;flex-direction:column;gap:6px}
+.bar{height:10px;background:var(--ink-2);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#fff1c4);transition:width .5s}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.slot{aspect-ratio:5/8;border:0;padding:0;background:none;color:inherit}
+.slot .card{padding:6px;border-width:2px}
+.slot .card .art{font-size:36px;margin:3px 0}
+.slot .card .nm{font-size:13px}
+.slot .card .no{font-size:10px}
+.slot .card .rk{font-size:9px}
+.slot.empty .card{border-style:dashed;border-color:var(--line);background:#111734}
+.slot.empty .art:not(.pic){filter:brightness(0) opacity(.35)}
+.slot.empty .nm,.slot.empty .rk{color:var(--muted)}
+.cnt{position:absolute;top:-6px;right:-6px;background:var(--gold);color:#1b1630;font-size:11px;font-weight:700;border-radius:99px;padding:1px 6px;z-index:2}
+.slot{position:relative}
+.slot.canfuse::after{content:"합성 가능";position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);background:#ff9be8;color:#1b1630;font-size:10px;font-weight:700;border-radius:99px;padding:1px 7px;white-space:nowrap;z-index:2}
+
+/* 팝업 */
+.modal{position:fixed;inset:0;background:#000b;display:grid;place-items:center;padding:16px;z-index:20}
+.modal[hidden]{display:none}
+.sheet{background:var(--ink-2);border:1px solid var(--line);border-radius:16px;padding:18px;max-width:380px;width:100%;display:flex;flex-direction:column;gap:12px;max-height:90vh;overflow:auto}
+.sheet .mini{width:150px;height:240px;margin:0 auto}
+.sheet h3{font-family:var(--display);margin:0;font-size:20px}
+.sheet p{margin:0;font-size:14px;line-height:1.65}
+.sheet dt{color:var(--muted);font-size:12px;margin-top:4px}
+.sheet dd{margin:0}
+
+
+/* ===== 전설 카드 전용 장식 ===== */
+@property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+.card.legend{padding:0;border:0;background:#1a1206;overflow:hidden;isolation:isolate;box-shadow:0 0 18px #ffcf4a66}
+.card.legend .art{position:absolute;inset:0;margin:0;border:0;border-radius:inherit;z-index:0}
+.card.legend .art.pic::after{background:linear-gradient(180deg,#140c0299 0%,transparent 20%,transparent 58%,#140c02f2 100%)}
+.card.legend .art.pic img{filter:saturate(1.25) contrast(1.08) sepia(.25)}
+.lg-frame{position:absolute;inset:0;border-radius:inherit;z-index:3;pointer-events:none;padding:6px;
+  background:conic-gradient(from var(--ang),#fff6c8,#e7b84a,#8a5a12,#ffe9a0,#c98b1e,#fff6c8,#9b6a14,#ffe9a0,#fff6c8);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  animation:spinang 4s linear infinite}
+.card.legend::after{content:"";position:absolute;inset:10px;border:1px solid #ffe9a0aa;border-radius:7px;z-index:3;pointer-events:none;box-shadow:inset 0 0 12px #ffcf4a55}
+@keyframes spinang{to{--ang:360deg}}
+.gem{position:absolute;width:12px;height:12px;z-index:4;transform:rotate(45deg);border-radius:2px;
+  background:radial-gradient(circle at 35% 35%,#fff,#ff4d6d 42%,#7a0020);box-shadow:0 0 8px #ff4d6d,0 0 0 2px #ffe9a0}
+.gem.g1{top:3px;left:3px}.gem.g2{top:3px;right:3px}.gem.g3{bottom:3px;left:3px}.gem.g4{bottom:3px;right:3px}
+.gem.g2,.gem.g3{background:radial-gradient(circle at 35% 35%,#fff,#4dc3ff 42%,#00337a);box-shadow:0 0 8px #4dc3ff,0 0 0 2px #ffe9a0}
+.lg-crown{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:4;background:linear-gradient(#fff3c4,#e7b84a 55%,#a8721a);color:#3a2300;
+  font-size:10px;font-weight:700;letter-spacing:.14em;padding:3px 12px 4px;border-radius:0 0 10px 10px;white-space:nowrap;box-shadow:0 2px 8px #0008}
+.card.legend .no{position:absolute;top:13px;left:15px;right:15px;z-index:4;color:#ffe9a0;text-shadow:0 1px 4px #000}
+.lg-plate{position:absolute;left:0;right:0;bottom:12px;z-index:4;text-align:center;padding:0 10px}
+.card.legend .nm{font-size:22px;background:linear-gradient(180deg,#fffbe6,#ffd978 55%,#c98b1e);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 6px #ffcf4acc) drop-shadow(0 2px 2px #000)}
+.card.legend .rk{color:#ffe9a0;letter-spacing:.2em}
+.lg-shine{position:absolute;inset:0;z-index:2;pointer-events:none;mix-blend-mode:screen;
+  background:linear-gradient(110deg,transparent 38%,#fff2c055 47%,#ffffffcc 50%,#fff2c055 53%,transparent 62%);background-size:260% 100%;animation:sweep 3.4s ease-in-out infinite}
+@keyframes sweep{0%{background-position:130% 0}60%,100%{background-position:-30% 0}}
+.spk{position:absolute;z-index:2;width:10px;height:10px;pointer-events:none;animation:twinkle 2.6s ease-in-out infinite;
+  background:radial-gradient(circle,#fff 0 18%,transparent 20%),linear-gradient(#fff9,#fff9) center/1.5px 100% no-repeat,linear-gradient(#fff9,#fff9) center/100% 1.5px no-repeat}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.3) rotate(0)}50%{opacity:1;transform:scale(1) rotate(45deg)}}
+.card.legend.holo::before{z-index:2}
+/* 도감 안의 작은 전설 카드 */
+.slot .card.legend .lg-frame{padding:3px}
+.slot .card.legend::after{inset:6px}
+.slot .gem{width:7px;height:7px;box-shadow:0 0 4px #ff4d6d,0 0 0 1px #ffe9a0}
+.slot .lg-crown{font-size:7px;padding:1px 6px 2px;letter-spacing:.08em}
+.slot .card.legend .no{top:9px;left:9px;font-size:9px}
+.slot .card.legend .nm{font-size:13px}
+.slot .lg-plate{bottom:7px}
+.slot.empty .card.legend{box-shadow:none}
+.slot.empty .card.legend .art.pic img{filter:brightness(.12) blur(1.5px)}
+.slot.empty .lg-frame{animation:none;opacity:.55}
+.slot.empty .card.legend .lg-shine,.slot.empty .spk{display:none}
+.slot.empty .card.legend .nm{background:none;color:var(--muted);filter:none}
+.sp .card.legend .nm{font-size:13px}.sp .lg-crown{font-size:7px;padding:1px 6px 2px}.sp .gem{width:7px;height:7px}.sp .card.legend .lg-frame{padding:3px}.sp .card.legend::after{inset:6px}
+.sp .card.legend .no{top:9px;left:9px}.sp .lg-plate{bottom:7px}
+/* 뽑을 때: 금빛 뒷면 + 빛줄기 */
+.big.lg .face.b{filter:sepia(1) saturate(2.4) hue-rotate(-14deg) brightness(1.2);box-shadow:0 0 28px #ffcf4a}
+.rays{position:absolute;inset:-110px;z-index:-1;border-radius:50%;pointer-events:none;opacity:0;transition:opacity .8s;
+  background:repeating-conic-gradient(from 0deg,#ffd97866 0 5deg,transparent 5deg 14deg);
+  -webkit-mask:radial-gradient(circle,#000 22%,transparent 68%);mask:radial-gradient(circle,#000 22%,transparent 68%);animation:rot 14s linear infinite}
+.big.lg.charge .rays{opacity:.25}
+.big.flipped .rays{opacity:1}
+@keyframes rot{to{transform:rotate(360deg)}}
+/* 뽑기 방식 / 확정권 */
+.modebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-grid;grid-template-columns:1fr 1fr;background:var(--ink-2);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{background:none;border:0;color:var(--muted);padding:7px 12px;border-radius:7px;font-size:13px;font-weight:500}
+.seg button[aria-checked="true"]{background:var(--line);color:var(--text)}
+.ticket{background:none;border:1px dashed var(--r-e);color:var(--r-e);border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700}
+.ticket[aria-pressed="true"]{background:var(--r-e);color:#1b1630;border-style:solid}
+.ticket[hidden]{display:none}
+.pity{display:flex;flex-direction:column;gap:6px}
+.bar.thin{height:6px}
+.bar.thin i{background:linear-gradient(90deg,#ffcf4a,#fff1c4)}
+/* 과거·현재·미래 */
+.spread{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:400px}
+.sp{display:flex;flex-direction:column;align-items:center;gap:6px}
+.sp .lbl{font-family:var(--display);font-size:14px;color:var(--gold)}
+.sp .big{width:100%;height:auto;aspect-ratio:5/8}
+.sp .card{padding:6px;border-width:2px}
+.sp .card .nm{font-size:13px}.sp .card .no{font-size:10px}.sp .card .rk{font-size:8px}
+.sp .card .art{font-size:34px;margin:3px 0}
+.sp .glow{inset:-10px;filter:blur(12px)}
+.spread-rows{display:grid;gap:8px}
+.spread-rows div{display:grid;grid-template-columns:44px 1fr;gap:8px;font-size:14px;line-height:1.6}
+.spread-rows b{font-family:var(--display);color:var(--gold);font-weight:400}
+/* 도감 부가 */
+.sec-title{font-family:var(--display);font-size:17px;margin:4px 0 0;color:var(--gold)}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.badge{display:flex;gap:8px;align-items:center;background:var(--ink-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.35}
+.badge i{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:15px;background:#0f1530;color:var(--muted);border:1px solid var(--line)}
+.badge.on{border-color:var(--gold)}
+.badge.on i{background:var(--gold);color:#1b1630;border-color:var(--gold)}
+.badge small{display:block;color:var(--muted);font-size:11px}
+.badge:not(.on) b{color:var(--muted)}
+/* 출석 */
+.att{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;font-size:11px;color:var(--muted)}
+.att span{display:grid;place-items:center;aspect-ratio:1;border-radius:50%;border:1px solid var(--line);font-size:13px;color:var(--muted);margin-bottom:3px}
+.att .done span{background:var(--gold);color:#1b1630;border-color:var(--gold);font-weight:700}
+.att .today span{box-shadow:0 0 0 3px #e7c37a55}
+.att .big7 span{border-color:var(--r-e);color:var(--r-e)}
+/* 궁합 */
+.compat-form{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.compat-form input{min-width:0;background:var(--ink-2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px 12px;font-size:15px;font-family:inherit;text-align:center}
+.compat-form .amp{color:var(--gold);font-size:20px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:340px;margin:0 auto;width:100%}
+.pair .sp .big{width:100%}
+.meter{display:flex;flex-direction:column;align-items:center;gap:4px}
+.meter .num{font-family:var(--display);font-size:44px;color:#ff9fb8;font-variant-numeric:tabular-nums;line-height:1}
+.meter .bar{width:100%}
+.meter .bar i{background:linear-gradient(90deg,#ff9fb8,#ffd1dc)}
+/* 광고 칸 */
+.ad{min-height:60px;border-radius:10px;overflow:hidden;text-align:center;background:#0f1530;border:1px solid var(--line);padding:6px}
+.ad[hidden]{display:none}
+.ad::before{content:"광고";display:block;font-size:10px;color:var(--muted);text-align:left;margin-bottom:4px}
+/* 상점 */
+.shop-note{margin:4px 0 0;color:var(--muted);font-size:13px}
+.shop-list{display:grid;gap:8px;margin-top:8px}
+.item{display:flex;align-items:center;gap:12px;background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.item .ic{flex:none;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:#0f1530;color:var(--gold);font-size:18px;border:1px solid var(--line)}
+.item .tx{flex:1;min-width:0;font-size:14px;line-height:1.4}
+.item .tx small{display:block;color:var(--muted);font-size:12px}
+.price{flex:none;background:var(--gold);color:#1b1630;border:0;border-radius:9px;padding:8px 12px;font-size:13px;font-weight:700;white-space:nowrap}
+.price.own{background:none;color:var(--gold);border:1px solid var(--gold)}
+.price.on{background:#2e3a6e;color:var(--text);border:0}
+.price:disabled{opacity:.4;cursor:not-allowed}
+.back-list{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px}
+.bk{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;color:var(--text);padding:0;font-size:12px}
+.bk .pv{width:100%;aspect-ratio:5/8;border-radius:8px;background-size:100% 100%;border:2px solid transparent}
+.bk.on .pv{border-color:var(--gold);box-shadow:0 0 12px #e7c37a88}
+.bk small{color:var(--muted)}
+.mori-preview{width:110px;height:110px;margin:8px auto;border-radius:50%;background:radial-gradient(circle at 50% 60%,#2e3a75,#1a2150);border:2px solid var(--gold);display:grid;place-items:end center;overflow:hidden}
+.mori-preview svg{width:100px;height:100px}
+.slot.shopc .card{cursor:pointer}
+.slot .tagown{position:absolute;top:-6px;left:-6px;z-index:2;background:#2e3a6e;color:var(--text);font-size:10px;border-radius:99px;padding:1px 6px}
+.slot .tagnew{position:absolute;top:-6px;left:-6px;z-index:2;background:#ff9be8;color:#1b1630;font-weight:700;font-size:10px;border-radius:99px;padding:1px 6px}
+canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--gold);color:#1b1630;padding:10px 16px;border-radius:10px;font-weight:700;font-size:14px;z-index:40;transition:opacity .3s}
+.toast[hidden]{display:none}
+.foot{color:var(--muted);font-size:12px;text-align:center;margin-top:auto}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1 id="title" style="cursor:default;user-select:none">별빛 타로 도감</h1>
+    <div class="wallet">
+      <span class="chip">뽑기 <b id="draws">5</b></span>
+      <button class="chip" id="dustChip" style="color:inherit;font:inherit;font-size:13px;cursor:pointer" aria-label="별가루 상점 열기">별가루 <b id="dust">0</b></button>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab-draw" aria-selected="true">카드 뽑기</button>
+    <button role="tab" id="tab-book" aria-selected="false">내 도감</button>
+    <button role="tab" id="tab-compat" aria-selected="false">궁합</button>
+    <button role="tab" id="tab-shop" aria-selected="false">상점</button>
+  </div>
+
+  <!-- 뽑기 화면 -->
+  <section class="view" id="view-draw">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="guide">
+        <div class="owl" id="owl" aria-hidden="true"></div>
+        <div class="bubble"><small>점술사 부엉이 모리</small><span id="say">고민을 하나 떠올리고 카드를 섞어 봐. 아주 가끔 빛나는 카드가 나온다구!</span></div>
+      </div>
+      <div class="modebar">
+        <div class="seg" role="radiogroup" aria-label="뽑기 방식">
+          <button role="radio" id="m-one" aria-checked="true">한 장 뽑기</button>
+          <button role="radio" id="m-three" aria-checked="false">과거·현재·미래</button>
+        </div>
+        <button class="ticket" id="ticketBtn" aria-pressed="false" hidden></button>
+      </div>
+      <div class="ask">
+        <label for="q" style="position:absolute;left:-9999px">고민</label>
+        <input id="q" maxlength="40" placeholder="예) 이번 시험 잘 볼 수 있을까?">
+        <button class="btn" id="shuffle">카드 섞기</button>
+      </div>
+      <div class="stage" id="stage"><div class="fan" id="fan"></div></div>
+      <div class="result" id="result" hidden></div>
+      <div class="ad" id="ad1" hidden></div>
+      <div class="odds" id="odds" aria-label="희귀도별 확률"></div>
+      <div class="pity">
+        <div style="display:flex;justify-content:space-between;gap:8px;font-size:13px"><span>전설 확정까지 앞으로 <b id="pityLeft" style="color:#ffcf4a">50</b>번</span><span id="seasonNote" style="color:#5ff2c6"></span></div>
+        <div class="bar thin"><i id="pityBar" style="width:0%"></i></div>
+      </div>
+      <p class="foot" style="margin:0">홀로 카드는 에픽(15%)·전설(25%)·한정(15%)에서만 나와요 · 겹친 카드는 별가루로 바뀌어요(10개 = 뽑기 1번) · 에픽 이상 같은 카드 3장은 도감에서 홀로로 합성할 수 있어요</p>
+    </div>
+  </section>
+
+  <!-- 도감 화면 -->
+  <section class="view" id="view-book" hidden>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="prog">
+        <div style="display:flex;justify-content:space-between;font-size:14px"><span>모은 카드 <b id="have">0</b> / 22</span><span style="color:var(--muted)">홀로 <b id="holoCnt">0</b>장</span></div>
+        <div class="bar"><i id="barI" style="width:0%"></i></div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <h3 class="sec-title">한정 카드</h3>
+      <div class="grid" id="seasonGrid"></div>
+      <h3 class="sec-title">업적 배지 <span id="badgeCnt" style="font-size:13px;color:var(--muted)"></span></h3>
+      <div class="badges" id="badges"></div>
+      <button class="btn ghost" id="reset" style="align-self:center;font-size:13px;padding:8px 14px">도감 처음부터 다시 하기</button>
+    </div>
+  </section>
+
+  <!-- 궁합 화면 -->
+  <section class="view" id="view-compat" hidden>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="guide">
+        <div class="owl" id="owl2" aria-hidden="true"></div>
+        <div class="bubble"><small>점술사 부엉이 모리</small><span id="say2">두 사람 이름을 적으면 각자 한 장씩 뽑아서 궁합을 봐 줄게. 친구, 가족, 좋아하는 사람 누구든 돼!</span></div>
+      </div>
+      <div class="compat-form">
+        <label for="nA" style="position:absolute;left:-9999px">내 이름</label><input id="nA" maxlength="10" placeholder="내 이름">
+        <span class="amp" aria-hidden="true">♥</span>
+        <label for="nB" style="position:absolute;left:-9999px">상대 이름</label><input id="nB" maxlength="10" placeholder="상대 이름">
+      </div>
+      <button class="btn" id="compatGo">궁합 카드 뽑기</button>
+      <div id="compatStage"></div>
+      <div class="result" id="compatResult" hidden></div>
+      <div class="ad" id="ad2" hidden></div>
+      <p class="foot" style="margin:0">궁합 타로는 뽑기권을 쓰지 않아요 · 같은 두 사람은 하루 동안 같은 결과가 나와요</p>
+    </div>
+  </section>
+
+  <!-- 상점 화면 -->
+  <section class="view" id="view-shop" hidden>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="guide">
+        <div class="owl" id="owl3" aria-hidden="true"></div>
+        <div class="bubble"><small>모리의 별가루 상점</small><span>어서 와! 겹친 카드에서 나온 별가루로 원하는 걸 골라 봐. 지금 가진 별가루는 <b id="shopDust" style="color:var(--gold)">0</b>개야.</span></div>
+      </div>
+      <div><h3 class="sec-title">뽑기</h3><div class="shop-list" id="shopDraw"></div></div>
+      <div><h3 class="sec-title">카드 교환</h3><p class="shop-note">빠진 카드를 골라서 바로 가질 수 있어요. 전설 카드와 한정 카드는 교환할 수 없어요.</p>
+        <div class="seg" role="radiogroup" aria-label="교환할 희귀도" style="grid-template-columns:repeat(3,1fr);margin:8px 0">
+          <button role="radio" id="ex-n" aria-checked="true">일반 30</button><button role="radio" id="ex-r" aria-checked="false">레어 60</button><button role="radio" id="ex-e" aria-checked="false">에픽 150</button>
+        </div>
+        <div class="grid" id="shopCards"></div></div>
+      <div><h3 class="sec-title">카드 뒷면 디자인</h3><div class="back-list" id="shopBacks"></div></div>
+      <div><h3 class="sec-title">모리 꾸미기</h3><div class="mori-preview" id="moriPrev"></div><div class="shop-list" id="shopMori"></div></div>
+    </div>
+  </section>
+
+  <p class="foot">재미로 보는 타로예요 · 기록은 이 기기에만 저장돼요</p>
+</div>
+
+<div class="modal" id="modal" hidden><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast" hidden></div>
+<canvas id="fx"></canvas>
+<script src="art.js"></script>
+<script>
+const RANK = {
+  n:{name:"일반", en:"COMMON", w:60, dust:1, color:"#a9b3c9"},
+  r:{name:"레어", en:"RARE", w:28, dust:2, color:"#5ab0ff"},
+  e:{name:"에픽", en:"EPIC", w:10, dust:5, color:"#c48bff"},
+  l:{name:"전설", en:"LEGEND", w:2, dust:15, color:"#ffcf4a"},
+  s:{name:"한정", en:"LIMITED", w:0, dust:8, color:"#5ff2c6"}
+};
+const ROMAN=["0","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","★"];
+const CARDS = [
+ {id:0,name:"바보",icon:"🎒",r:"n",key:"새 출발",up:"겁내지 말고 첫발을 내디뎌 봐. 처음이라 서툴러도 괜찮아, 그게 바로 모험의 시작이야.",rev:"너무 급하게 뛰어들면 넘어질 수 있어. 한 번만 더 확인하고 출발하자."},
+ {id:1,name:"마법사",icon:"🪄",r:"e",key:"재능, 실행",up:"필요한 건 이미 다 가지고 있어. 생각만 하지 말고 지금 바로 해 보면 잘 풀려.",rev:"재능을 엉뚱한 데 쓰고 있진 않은지 살펴봐. 계획을 다시 정리하면 좋아."},
+ {id:2,name:"여사제",icon:"🌙",r:"e",key:"직감, 비밀",up:"마음속 목소리가 답을 알고 있어. 조용히 생각해 보는 시간을 가져 봐.",rev:"남의 말에 너무 흔들리고 있어. 내 느낌을 믿어도 돼."},
+ {id:3,name:"여황제",icon:"🌸",r:"r",key:"풍요, 돌봄",up:"좋은 것들이 무럭무럭 자라는 때야. 주변 사람을 잘 챙기면 행운이 돌아와.",rev:"남만 챙기다 나를 잊었어. 오늘은 나에게도 잘해 주자."},
+ {id:4,name:"황제",icon:"👑",r:"r",key:"리더십, 계획",up:"규칙을 세우고 차근차근 하면 이길 수 있어. 네가 이끌어도 좋아.",rev:"너무 고집부리면 친구가 멀어질 수 있어. 다른 의견도 들어 보자."},
+ {id:5,name:"교황",icon:"📜",r:"n",key:"배움, 조언",up:"믿을 만한 어른이나 선배에게 물어보면 좋은 답을 얻어.",rev:"남들이 하는 대로만 할 필요는 없어. 나만의 방법도 괜찮아."},
+ {id:6,name:"연인",icon:"💞",r:"r",key:"선택, 관계",up:"마음이 맞는 사람과 함께하면 힘이 두 배! 중요한 선택은 마음이 끌리는 쪽으로.",rev:"고민하는 두 길 사이에서 망설이고 있어. 정말 원하는 게 뭔지 적어 봐."},
+ {id:7,name:"전차",icon:"🏇",r:"r",key:"전진, 승리",up:"목표를 향해 힘차게 달릴 때야. 포기하지 않으면 결승선에 닿아.",rev:"방향 없이 달리면 지쳐. 잠깐 멈추고 길을 확인하자."},
+ {id:8,name:"힘",icon:"🦁",r:"r",key:"용기, 인내",up:"부드럽지만 강한 마음이 이겨. 차분하게 버티면 다 잘될 거야.",rev:"스스로를 너무 의심하고 있어. 넌 생각보다 훨씬 강해."},
+ {id:9,name:"은둔자",icon:"🏮",r:"r",key:"생각, 성찰",up:"혼자만의 시간이 답을 알려줘. 조용한 곳에서 생각을 정리해 봐.",rev:"너무 혼자 있으면 외로워져. 친구에게 먼저 연락해 보자."},
+ {id:10,name:"운명의 수레바퀴",icon:"🎡",r:"e",key:"전환점, 행운",up:"바퀴가 좋은 쪽으로 돌기 시작했어! 기회가 오면 꽉 잡아.",rev:"잠깐 운이 안 따라도 바퀴는 계속 돌아. 곧 좋아질 거야."},
+ {id:11,name:"정의",icon:"⚖️",r:"r",key:"공정, 균형",up:"정직하게 하면 그만큼 좋은 결과가 돌아와.",rev:"불공평하다고 느끼는 일이 있구나. 차분하게 사실을 정리해 봐."},
+ {id:12,name:"매달린 사람",icon:"🙃",r:"n",key:"기다림, 관점",up:"거꾸로 보면 새로운 게 보여. 서두르지 말고 다른 시선으로 생각해 봐.",rev:"기다리기만 하면 시간이 아까워. 작은 것부터 움직여 보자."},
+ {id:13,name:"죽음",icon:"🦋",r:"n",key:"끝과 시작",up:"무서운 카드가 아니야! 하나가 끝나야 새로운 게 시작돼. 변화를 받아들여 봐.",rev:"끝내야 할 걸 붙잡고 있어. 놓아 주면 마음이 가벼워져."},
+ {id:14,name:"절제",icon:"🏺",r:"n",key:"조화, 균형",up:"딱 알맞게가 정답이야. 공부와 휴식, 둘 다 챙기면 좋아.",rev:"한쪽으로 너무 치우쳤어. 오늘은 균형을 맞춰 보자."},
+ {id:15,name:"악마",icon:"⛓️",r:"n",key:"유혹, 습관",up:"자꾸 끌리는 나쁜 습관이 있지? 알아차리는 것만으로도 반은 성공이야.",rev:"묶여 있던 사슬이 풀리고 있어. 이제 벗어날 수 있어!"},
+ {id:16,name:"탑",icon:"⚡",r:"n",key:"갑작스러운 변화",up:"깜짝 놀랄 일이 생길 수 있어. 하지만 무너진 자리에 더 튼튼한 걸 지을 수 있어.",rev:"큰 위기는 살짝 비켜 갔어. 미리 대비하면 걱정 없어."},
+ {id:17,name:"별",icon:"🌟",r:"l",key:"희망, 꿈",up:"반짝이는 희망이 너를 비추고 있어. 꿈꾸던 일이 이루어질 거야!",rev:"희망을 잠깐 잃었구나. 하늘을 봐, 별은 늘 그 자리에 있어."},
+ {id:18,name:"달",icon:"🌕",r:"e",key:"불안, 상상",up:"마음이 조금 흐릿할 수 있어. 확실하지 않은 소문은 믿지 말자.",rev:"걱정했던 안개가 걷히고 있어. 곧 분명하게 보일 거야."},
+ {id:19,name:"태양",icon:"☀️",r:"l",key:"성공, 기쁨",up:"최고의 카드! 밝고 즐거운 일이 가득해. 자신 있게 웃어 봐.",rev:"해가 구름에 살짝 가렸을 뿐이야. 기쁨은 금방 다시 와."},
+ {id:20,name:"심판",icon:"📯",r:"e",key:"깨달음, 부름",up:"노력한 만큼 인정받는 때야. 새로운 기회의 나팔이 울려!",rev:"지난 실수로 너무 자신을 탓하지 마. 다시 시작하면 돼."},
+ {id:21,name:"세계",icon:"🌍",r:"l",key:"완성, 성취",up:"하나를 멋지게 끝내는 카드야! 축하해, 원하던 걸 이뤄 낼 거야.",rev:"거의 다 왔어! 마지막 한 조각만 채우면 완성이야."},
+ {id:22,name:"합격의 별",icon:"🌠",r:"s",season:true,key:"합격, 응원",up:"그동안 쌓아 온 노력이 별똥별처럼 빛날 거야. 아는 문제부터 차분히 풀면 실력이 그대로 나와!",rev:"긴장해서 마음이 흔들리고 있구나. 크게 숨 한 번 쉬고, 지금까지 해 온 너를 믿어 봐."}
+];
+const BASE=CARDS.filter(c=>!c.season), SEASON=CARDS.filter(c=>c.season);
+const SEASON_END=new Date(2026,10,30,23,59,59), SEASON_RATE=5, PITY=50;
+const HOLO_RATE={e:.15,l:.25,s:.15};
+const canHolo=c=>c.r in HOLO_RATE;
+const inSeason=()=>new Date()<=SEASON_END;
+const MAX_DRAWS=2, DUST_COST=10;
+// ---- 광고 설정 ----
+// 광고 회사(구글 애드센스, 카카오 애드핏 등)에서 받은 광고 코드를 아래 따옴표 안에 넣으면
+// 뽑기 결과 아래와 궁합 결과 아래에 광고가 보여요. 비워 두면 광고 칸은 숨겨져요.
+const AD_CODE=``;
+
+// ---- 저장 (이 기기 브라우저에만) ----
+const FRESH=()=>({col:{}, dust:0, draws:MAX_DRAWS, day:"", tickets:0, pity:0, total:0, fused:0, badges:{}, att:{last:"",streak:0}, shop:{backs:["basic"],back:"basic",hats:["blue"],hat:"blue",accs:[],wear:{}}});
+let S = FRESH();
+const today=()=>new Date().toLocaleDateString("ko-KR");
+function load(){try{const s=JSON.parse(localStorage.getItem("starTarot")||"null");if(s)S=Object.assign(FRESH(),s);}catch(e){} if(S.day!==today()){S.day=today();S.draws=MAX_DRAWS;} save();}
+function save(){try{localStorage.setItem("starTarot",JSON.stringify(S));}catch(e){}}
+
+const $=id=>document.getElementById(id);
+const ART=id=>(window.CARD_ART||{})[id];
+function cardHTML(c,{rev=false,holo=false}={}){
+  if(c.r==="l") return `<div class="card r-l legend${rev?" rev":""}${holo?" holo":""}">
+    <div class="art${ART(c.id)?" pic":""}">${ART(c.id)?`<img src="${ART(c.id)}" alt="" draggable="false">`:`<span aria-hidden="true">${c.icon}</span>`}</div>
+    <div class="lg-shine" aria-hidden="true"></div>
+    ${[[18,30],[78,22],[30,62],[84,55],[62,40],[14,48]].map(([x,y],i)=>`<i class="spk" style="left:${x}%;top:${y}%;animation-delay:${i*.45}s" aria-hidden="true"></i>`).join("")}
+    <div class="lg-frame" aria-hidden="true"></div>
+    <i class="gem g1"></i><i class="gem g2"></i><i class="gem g3"></i><i class="gem g4"></i>
+    <div class="lg-crown">♛ LEGEND</div>
+    <div class="no"><span>${ROMAN[c.id]}</span><span>${holo?"✦ HOLO":""}</span></div>
+    <div class="lg-plate"><div class="nm">${c.name}</div><div class="rk">전설 · 2%</div></div>
+  </div>`;
+  return `<div class="card r-${c.r}${rev?" rev":""}${holo?" holo":""}">
+    <div class="no"><span>${ROMAN[c.id]||""}</span><span>${holo?"✦ HOLO":""}</span></div>
+    <div class="art${ART(c.id)?" pic":""}">${ART(c.id)?`<img src="${ART(c.id)}" alt="" draggable="false">`:`<span aria-hidden="true">${c.icon}</span>`}</div>
+    <div style="text-align:center"><div class="nm">${c.name}</div><div class="rk">${RANK[c.r].name} · ${RANK[c.r].en}</div></div>
+  </div>`;
+}
+let mode="one", useTicket=false;
+function refresh(){
+  $("draws").textContent=S.draws; $("dust").textContent=S.dust;
+  const btn=$("shuffle");
+  if(S.tickets<=0) useTicket=false;
+  const tb=$("ticketBtn"); tb.hidden=!(S.tickets>0&&mode==="one");
+  tb.textContent=useTicket?`✦ 확정권 사용 중 (${S.tickets}장)`:`✦ 에픽 이상 확정권 ${S.tickets}장 쓰기`; tb.setAttribute("aria-pressed",useTicket);
+  if(mode==="three"){
+    if(S.draws>=2){btn.textContent="세 장 섞기 (뽑기 2번)";btn.disabled=false;}
+    else if(S.draws+Math.floor(S.dust/DUST_COST)>=2){btn.textContent="별가루로 세 장 섞기";btn.disabled=false;}
+    else {btn.textContent="뽑기 2번 필요";btn.disabled=true;}
+  } else if(useTicket){btn.textContent="확정권으로 섞기";btn.disabled=false;}
+  else if(S.draws>0){btn.textContent="카드 섞기";btn.disabled=false;}
+  else if(S.dust>=DUST_COST){btn.textContent=`별가루 ${DUST_COST}개로 뽑기`;btn.disabled=false;}
+  else {btn.textContent="내일 다시!";btn.disabled=true;}
+  const left=Math.max(1,PITY-S.pity); $("pityLeft").textContent=left; $("pityBar").style.width=(S.pity/PITY*100)+"%";
+  $("seasonNote").textContent=inSeason()?"수능 한정 카드 11월 30일까지":"";
+  $("odds").innerHTML=["n","r","e","l"].map(k=>`<div class="r-${k}"><b>${RANK[k].name}</b>${RANK[k].w}%</div>`).join("")+(inSeason()?`<div class="r-s"><b>한정</b>${SEASON_RATE}%</div>`:"");
+  renderBook(); if($("view-shop")&&!$("view-shop").hidden) renderShop();
+}
+function say(t){$("say").textContent=t;const o=$("owl");if(o){o.classList.remove("hop");void o.offsetWidth;o.classList.add("hop");}}
+function toast(t){const el=$("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200);}
+
+// ---- 뽑기 ----
+function roll(min){
+  let rk="n", pity=false;
+  if(S.pity>=PITY-1){ rk="l"; pity=true; }
+  else if(min==="e"){ rk=Math.random()<.17?"l":"e"; }
+  else if(inSeason()&&Math.random()*100<SEASON_RATE){ rk="s"; }
+  else { let x=Math.random()*100; for(const k of ["l","e","r","n"]){ if(x<RANK[k].w){rk=k;break;} x-=RANK[k].w; } }
+  S.pity = rk==="l"?0:S.pity+1; S.total=(S.total||0)+1; save();
+  const pool=(rk==="s"?SEASON:BASE).filter(c=>c.r===rk);
+  return {card:pool[Math.floor(Math.random()*pool.length)], rev:Math.random()<.3, holo:Math.random()<(HOLO_RATE[rk]||0), pity};
+}
+let busy=false;
+$("shuffle").onclick=()=>{
+  if(busy)return;
+  if(mode==="three"){
+    while(S.draws<2&&S.dust>=DUST_COST){ S.dust-=DUST_COST; S.draws+=1; }
+    if(S.draws<2){ refresh(); return; }
+    save(); refresh();
+  } else if(!useTicket&&S.draws<=0){ if(S.dust<DUST_COST)return; S.dust-=DUST_COST; S.draws+=1; save(); refresh(); }
+  deal();
+};
+function setMode(m){ if(busy) return; mode=m; $("m-one").setAttribute("aria-checked",m==="one"); $("m-three").setAttribute("aria-checked",m==="three");
+  if(m==="three") useTicket=false; refresh();
+  say(m==="three"?"과거, 현재, 미래를 한 장씩 보는 방법이야. 카드 세 장을 차례로 골라 줘!":"고민을 하나 떠올리고 카드를 골라 봐.");
+  if(S.draws>0||m==="three") deal(); }
+$("m-one").onclick=()=>setMode("one"); $("m-three").onclick=()=>setMode("three");
+$("ticketBtn").onclick=()=>{ if($("big")&&!$("big").classList.contains("flipped"))return; useTicket=!useTicket; refresh(); if(useTicket) say("확정권을 쓰면 에픽이나 전설 카드가 꼭 나와! 카드를 골라 봐."); if(!document.querySelector(".back")) deal(); };
+const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+function setT(el,o){ for(const k in o) el.style.setProperty("--"+k,o[k]); }
+function deal(){
+  $("result").hidden=true;
+  const stage=$("stage"); stage.innerHTML='<div class="fan" id="fan"></div>';
+  const fan=$("fan"), n=7, cards=[];
+  busy=true;
+  for(let i=0;i<n;i++){
+    const b=document.createElement("button"); b.className="back"; b.setAttribute("aria-label",`${i+1}번째 카드 고르기`);
+    setT(b,{tx:"0px",ty:"0px",rot:"0deg",ry:"0deg",sc:1}); fan.appendChild(b); cards.push(b);
+    b.onclick=()=>pick(b,fan);
+  }
+  const fanOut=()=>cards.forEach((b,i)=>{ b.style.transitionDelay=`${i*40}ms`; setT(b,{tx:"0px",ty:"0px",rot:`${(i-(n-1)/2)*11}deg`}); });
+  if(RM()){ fanOut(); busy=false; }
+  else {
+    // 1) 사방으로 흩어졌다가 2) 한 덩어리로 모였다가 3) 한 번 더 섞고 4) 부채꼴로 펼침
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      cards.forEach(b=>setT(b,{tx:`${(Math.random()-.5)*260}px`,ty:`${-40-Math.random()*90}px`,rot:`${(Math.random()-.5)*80}deg`,ry:`${Math.random()<.5?180:-180}deg`}));
+      setTimeout(()=>cards.forEach(b=>setT(b,{tx:"0px",ty:"-30px",rot:"0deg",ry:"0deg"})),420);
+      setTimeout(()=>cards.forEach((b,i)=>setT(b,{tx:`${(i%2?1:-1)*(30+Math.random()*30)}px`,ty:`${-20-Math.random()*20}px`,rot:`${(i%2?1:-1)*8}deg`})),760);
+      setTimeout(()=>cards.forEach(b=>setT(b,{tx:"0px",ty:"-10px",rot:"0deg"})),1000);
+      setTimeout(()=>{ fanOut(); setTimeout(()=>{cards.forEach(b=>b.style.transitionDelay="0ms"); busy=false;},500); },1250);
+    }));
+  }
+  picks=[];
+  say(mode==="three"?"카드를 섞었어. 과거, 현재, 미래 순서로 세 장을 골라 줘!":"카드를 잘 섞었어. 마음이 가는 한 장을 골라 봐!");
+}
+let picks=[];
+function pick(b,fan){
+  if(busy)return;
+  if(mode==="three") return pickThree(b,fan);
+  busy=true;
+  let res;
+  if(useTicket&&S.tickets>0){ S.tickets--; useTicket=false; save(); res=roll("e"); }
+  else {
+    if(S.draws<=0){ if(S.dust>=DUST_COST){ S.dust-=DUST_COST; S.draws+=1; } else { busy=false; refresh(); say("오늘 뽑기를 다 썼어. 내일 다시 와 줘!"); return; } }
+    S.draws-=1; save(); res=roll(); }
+  refresh();
+  [...fan.children].forEach((x,i)=>{ if(x!==b){ x.classList.add("gone"); setT(x,{ty:"60px"}); } });
+  b.classList.add("chosen");
+  setT(b,{tx:"0px",ty:"-90px",rot:"0deg",ry:"360deg",sc:1.35});
+  setTimeout(()=>showBig(res),RM()?100:650);
+}
+// 손가락/마우스를 따라 카드가 기울어지는 효과
+function attachTilt(area,target){
+  if(RM()) return;
+  const move=(x,y)=>{ const r=area.getBoundingClientRect(); const px=Math.min(1,Math.max(0,(x-r.left)/r.width)), py=Math.min(1,Math.max(0,(y-r.top)/r.height));
+    setT(target,{rx:`${(.5-py)*28}deg`,rt:`${(px-.5)*32}deg`,mx:`${px*100}%`,my:`${py*100}%`}); target.classList.add("tilting"); };
+  const reset=()=>{ setT(target,{rx:"0deg",rt:"0deg",mx:"50%",my:"30%"}); target.classList.remove("tilting"); };
+  area.addEventListener("pointermove",e=>move(e.clientX,e.clientY));
+  area.addEventListener("pointerleave",reset);
+  area.addEventListener("pointerup",e=>{ if(e.pointerType!=="mouse") reset(); });
+  area.addEventListener("pointercancel",reset);
+  reset();
+}
+function showBig(res){
+  const {card,rev,holo}=res, rk=RANK[card.r], fancy=card.r==="e"||card.r==="l"||card.r==="s";
+  const stage=$("stage");
+  stage.innerHTML=`<div class="big enter${card.r==="l"?" lg":""}" id="big" role="button" tabindex="0" aria-label="카드 뒤집기">
+     ${card.r==="l"?'<div class="rays" aria-hidden="true"></div>':""}
+     <div class="glow" id="glow" style="background:${rk.color}"></div>
+     <div class="float"><div class="tilt" id="tilt">
+       <div class="inner"><div class="face b"></div><div class="face f">${cardHTML(card,{rev,holo})}</div></div>
+     </div></div>
+     <div class="hint">눌러서 뒤집기 · 위로 밀어도 돼요</div></div>`;
+  const big=$("big"), glow=$("glow");
+  attachTilt(big,big);
+  if(card.r!=="n"){ setTimeout(()=>{glow.style.opacity=card.r==="r"?.35:.75;},200); }
+  if(fancy){ big.classList.add("charge"); say(card.r==="l"?(res.pity?"천장 도착! 이번엔 전설 카드가 확실히 나와!":"어...? 카드가 엄청 떨리고 있어!!"):card.r==="s"?"민트색 빛...? 이건 이번 달에만 나오는 카드야!":"오, 카드에서 빛이 나는데?"); }
+  else say("두근두근... 눌러서 뒤집어 봐!");
+  let done=false;
+  const flip=()=>{ if(done)return; done=true; busy=true;
+    big.classList.remove("charge"); if(fancy) big.classList.add("spin"); big.classList.add("flipped");
+    big.querySelector(".hint").textContent="";
+    glow.style.opacity=card.r==="n"?0:.9;
+    const t=RM()?50:(fancy?1300:750);
+    setTimeout(()=>{ big.classList.add("pop"); if(card.r==="l") flash(); reveal(res); },t); };
+  // 탭하거나 위로 쓸어 올리면 뒤집기
+  let sy=null;
+  big.addEventListener("pointerdown",e=>{sy=e.clientY;});
+  big.addEventListener("pointerup",e=>{ if(sy!==null&&sy-e.clientY>40) flip(); sy=null; });
+  big.onclick=flip; big.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();flip();}};
+}
+function addCard({card,holo}){
+  const key=card.id+(holo?"h":""), rk=RANK[card.r];
+  const first=!S.col[key]; let gained=0;
+  S.col[key]=(S.col[key]||0)+1;
+  if(!first){ gained=rk.dust*(holo?3:1); S.dust+=gained; }
+  save(); return {first,gained};
+}
+function reveal({card,rev,holo}){
+  const rk=RANK[card.r];
+  const {first,gained}=addCard({card,holo});
+  refresh(); busy=false; setTimeout(checkBadges,900);
+  if(card.r==="l"||card.r==="s"||holo) burst(holo?"holo":rk.color, card.r==="l"?160:110);
+  else if(card.r==="e") burst(rk.color,70);
+  const q=$("q").value.trim();
+  const lines={n:"좋은 메시지가 나왔어.",r:"레어 카드야, 운이 좋은걸?",e:"에픽 카드라니, 대단해!",l:"전설 카드!!! 이건 정말 귀한 거야!",s:"수능 한정 '합격의 별'이야! 이번 달에만 만날 수 있어. 시험 잘 보길 응원할게!"};
+  say(holo?"반짝반짝 홀로 카드야! 이건 진짜 보기 드물어!":lines[card.r]);
+  const r=$("result");
+  const meaning=rev?card.rev:card.up, other=rev?card.up:card.rev;
+  r.innerHTML=`${q?`<div class="q">나의 고민: ${esc(q)}</div>`:""}
+    <h2>${card.name} <span style="font-size:15px;color:var(--muted)">${rev?"(거꾸로)":"(바로)"}</span></h2>
+    <div class="tags">
+      <span class="tag" style="color:${rk.color}">${rk.name} · ${rk.w}%</span>
+      ${holo?'<span class="tag" style="color:#ff9be8">홀로</span>':""}
+    </div>
+    ${q?`<p class="summary wait" id="summary"><span class="dots">모리가 네 고민을 읽고 있어</span></p>`:`<p class="summary" id="summary">${meaning}</p>`}
+    <p class="${first?"new":""}" style="font-size:14px">${first?"✦ 새 카드! 도감에 추가했어요.":`이미 있는 카드라 별가루 ${gained}개로 바꿨어요.`}</p>
+    <button class="more-btn" id="moreBtn" aria-expanded="false" aria-controls="more">자세히 보기 ▾</button>
+    <div class="more" id="more" hidden>
+      ${q?`<p id="detail" class="wait">자세한 풀이를 준비하고 있어…</p>`:""}
+      <dl>
+        <dt>키워드</dt><dd>${card.key}</dd>
+        ${q?`<dt>카드의 기본 뜻</dt><dd>${meaning}</dd>`:""}
+        <dt>${rev?"바로 나왔다면":"거꾸로 나왔다면"}</dt><dd>${other}</dd>
+      </dl>
+    </div>
+    <div class="row"><button class="btn" id="again">한 번 더</button><button class="btn ghost" id="share">공유 이미지 만들기</button><button class="btn ghost" id="toBook">도감 보기</button></div>`;
+  r.hidden=false;
+  $("again").onclick=()=>{ $("shuffle").click(); window.scrollTo({top:0,behavior:"smooth"}); };
+  $("toBook").onclick=()=>tab("book");
+  lastRes={card,rev,holo,q}; $("share").onclick=makeShare;
+  $("moreBtn").onclick=()=>{ const m=$("more"), open=m.hidden; m.hidden=!open; $("moreBtn").setAttribute("aria-expanded",open); $("moreBtn").textContent=open?"접기 ▴":"자세히 보기 ▾"; };
+  if(first) toast(`${card.name}${holo?" (홀로)":""} 획득!`);
+  if(q) readForQuestion(q,card,rev);
+}
+
+// ---- 고민 맞춤 풀이 ----
+let samplerP=null;
+function getSampler(){ if(!samplerP) samplerP=(window.claude&&window.claude.use)?window.claude.use("sample").catch(()=>null):Promise.resolve(null); return samplerP; }
+const TOPICS=[
+  {k:["시험","공부","성적","숙제","학교","수능","과제","학원"],t:"공부"},
+  {k:["좋아","연애","사랑","고백","썸","남친","여친","짝사랑"],t:"마음"},
+  {k:["친구","사이","싸웠","화해","반"],t:"친구"},
+  {k:["돈","용돈","주식","살까","사도"],t:"돈"},
+  {k:["꿈","진로","미래","직업","대학","취업"],t:"진로"},
+  {k:["엄마","아빠","가족","동생","형","누나","언니","오빠"],t:"가족"},
+  {k:["건강","아파","운동","잠"],t:"몸과 마음"}
+];
+function fallbackReading(q,card,rev){
+  const hit=TOPICS.find(x=>x.k.some(w=>q.includes(w)));
+  const topic=hit?hit.t:"이 고민";
+  const tone=rev?"조금 조심하라는 신호야.":"좋은 방향을 가리키고 있어.";
+  return {short:`${topic}에 대해 ${card.name} 카드는 '${card.key}'을(를) 말해. ${tone} ${rev?card.rev:card.up}`, detail:null};
+}
+async function readForQuestion(q,card,rev){
+  const sum=$("summary"), det=$("detail");
+  const show=(sh,dt)=>{ if(!sum.isConnected)return;
+    if(sh){ sum.classList.remove("wait"); sum.textContent=sh; }
+    if(det&&dt){ det.classList.remove("wait"); det.textContent=dt; } };
+  const fb=()=>{ const f=fallbackReading(q,card,rev); show(f.short,null); if(det&&det.isConnected) det.remove(); };
+  const sample=await getSampler();
+  if(!sample){ fb(); return; }
+  const prompt=`너는 타로 앱의 귀여운 점술사 부엉이 '모리'야. 친근한 반말로, 학생도 쉽게 이해할 수 있게 말해.
+사용자의 고민: "${q}"
+뽑은 카드: ${card.name} (${rev?"거꾸로":"바로"} 나옴)
+카드 키워드: ${card.key}
+카드 기본 뜻: ${rev?card.rev:card.up}
+
+아래 형식 그대로 답해.
+요약: 고민에 대한 핵심 답을 4~5문장으로. 카드가 고민에 대해 뭐라고 하는지, 어떤 마음가짐이 좋은지, 그리고 응원 한마디까지 담아서 합쳐서 180~220자 정도로.
+자세히: 요약과 겹치지 않게, 카드 그림 속 상징이 고민과 어떻게 연결되는지와 앞으로의 흐름을 5~6문장으로 풀어 줘. 고민 내용을 직접 언급하고, 마지막 문장은 오늘 해 볼 수 있는 작은 행동 하나를 추천해.
+
+겁주거나 단정하지 말고 따뜻하게. 돈·건강처럼 중요한 결정은 '자세히'에서 어른이나 전문가와 상의하라고 부드럽게 덧붙여. 인사말, 이모지, 따옴표 없이.`;
+  const parse=t=>{ t=t.replace(/\*\*/g,""); const i=t.indexOf("자세히:");
+    const sh=(i<0?t:t.slice(0,i)).replace(/^\s*요약:\s*/,"").trim();
+    const dt=i<0?"":t.slice(i+4).trim(); return {sh,dt}; };
+  try{
+    const r=await sample(prompt,{modelTier:"quick",onText:({text})=>{ if(text&&!/^Thinking/.test(text)){ const x=parse(text); show(x.sh,x.dt); } }});
+    if(r&&r.text){ const x=parse(r.text); if(x.sh) show(x.sh,x.dt||(rev?card.rev:card.up)); else fb(); } else fb();
+  }catch(e){ fb(); }
+}
+
+// ---- 카드 뒷면 그림 ----
+const BACKS={
+  basic:{name:"별빛 기본",bg:"#151c42",hi:"#2b3770",g:"#e7c37a",price:0},
+  galaxy:{name:"은하수",bg:"#120a30",hi:"#4b2a86",g:"#d9c2ff",price:50},
+  sakura:{name:"벚꽃",bg:"#3b1532",hi:"#83386a",g:"#ffd0e1",price:50},
+  gold:{name:"황금",bg:"#2a1904",hi:"#7a5410",g:"#ffe08a",price:50}
+};
+function backSVG(key){
+  const T=BACKS[key]||BACKS.basic, G=T.g, BG=T.bg;
+  let extra="";
+  if(key==="galaxy"){ let sd=11; const r=()=>{sd=(sd*9301+49297)%233280;return sd/233280;};
+    extra=`<defs><radialGradient id="nb1"><stop offset="0" stop-color="#ff7ad9" stop-opacity=".55"/><stop offset="1" stop-color="#ff7ad9" stop-opacity="0"/></radialGradient><radialGradient id="nb2"><stop offset="0" stop-color="#6fb7ff" stop-opacity=".5"/><stop offset="1" stop-color="#6fb7ff" stop-opacity="0"/></radialGradient></defs>
+      <ellipse cx="70" cy="110" rx="90" ry="40" fill="url(#nb1)" transform="rotate(-30 70 110)"/><ellipse cx="135" cy="220" rx="90" ry="38" fill="url(#nb2)" transform="rotate(-30 135 220)"/>`;
+    for(let i=0;i<70;i++) extra+=`<circle cx="${(r()*200).toFixed(0)}" cy="${(r()*320).toFixed(0)}" r="${(r()*1.1+.3).toFixed(1)}" fill="#fff" opacity="${(.3+r()*.7).toFixed(2)}"/>`; }
+  if(key==="sakura"){ let sd=5; const r=()=>{sd=(sd*9301+49297)%233280;return sd/233280;};
+    for(let i=0;i<26;i++){ const x=(r()*200).toFixed(0), y=(r()*320).toFixed(0), a=(r()*180).toFixed(0), sz=(3+r()*4).toFixed(1);
+      extra+=`<ellipse cx="${x}" cy="${y}" rx="${sz}" ry="${(sz*.6).toFixed(1)}" fill="#ffb3cf" opacity="${(.35+r()*.5).toFixed(2)}" transform="rotate(${a} ${x} ${y})"/>`; } }
+  if(key==="gold"){ for(let i=-320;i<520;i+=18){ extra+=`<line x1="${i}" y1="0" x2="${i-320}" y2="320" stroke="${G}" stroke-width=".4" opacity=".25"/><line x1="${i-320}" y1="0" x2="${i}" y2="320" stroke="${G}" stroke-width=".4" opacity=".25"/>`; }
+    extra+=`<rect x="4" y="4" width="192" height="312" rx="11" fill="none" stroke="${G}" stroke-width="1.5"/>`; }
+  let s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 320">
+  <defs><radialGradient id="h" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="${T.hi}"/><stop offset="1" stop-color="${BG}"/></radialGradient></defs>
+  <rect width="200" height="320" rx="14" fill="${BG}"/>${extra}
+  <rect x="8" y="8" width="184" height="304" rx="9" fill="none" stroke="${G}" stroke-width="2.5"/>
+  <rect x="15" y="15" width="170" height="290" rx="6" fill="none" stroke="${G}" stroke-width=".8" opacity=".8"/>
+  <ellipse cx="100" cy="160" rx="80" ry="100" fill="url(#h)"/>`;
+  // 모서리 장식
+  [[15,15,1,1],[185,15,-1,1],[15,305,1,-1],[185,305,-1,-1]].forEach(([x,y,a,b])=>{
+    s+=`<path d="M${x} ${y+22*b} Q${x} ${y} ${x+22*a} ${y}" fill="none" stroke="${G}" stroke-width="1"/>
+        <path d="M${x+8*a} ${y+3*b} l${3*a} ${3*b} l${-3*a} ${3*b} l${-3*a} ${-3*b}z" fill="${G}"/>`;
+  });
+  // 위아래 달의 모양 변화
+  // 왼쪽부터 그믐-초승-보름-하현-그믐 느낌
+  const phases=(y)=>{ let p=""; [-2,-1,0,1,2].forEach(i=>{ const x=100+i*22, r=6;
+      if(Math.abs(i)===2){ p+=`<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${G}" stroke-width="1"/>`; return; }
+      p+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${G}"/>`;
+      if(i!==0) p+=`<circle cx="${x+(i<0?3.5:-3.5)}" cy="${y}" r="${r}" fill="${BG}"/>`;
+    }); return p; };
+  s+=phases(36)+phases(284);
+  // 가운데: 별자리 고리 + 해 + 초승달
+  s+=`<circle cx="100" cy="160" r="62" fill="none" stroke="${G}" stroke-width=".8" stroke-dasharray="2 4"/>
+      <circle cx="100" cy="160" r="50" fill="none" stroke="${G}" stroke-width="1.5"/>
+      <circle cx="100" cy="160" r="44" fill="none" stroke="${G}" stroke-width=".6"/>`;
+  for(let i=0;i<12;i++){ const a=i/12*Math.PI*2, x=100+Math.cos(a)*62, y=160+Math.sin(a)*62;
+    s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${i%3?1.6:3}" fill="${G}"/>`; }
+  for(let i=0;i<24;i++){ const a=i/24*Math.PI*2, r1=22, r2=i%2?34:40;
+    s+=`<line x1="${(100+Math.cos(a)*r1).toFixed(1)}" y1="${(160+Math.sin(a)*r1).toFixed(1)}" x2="${(100+Math.cos(a)*r2).toFixed(1)}" y2="${(160+Math.sin(a)*r2).toFixed(1)}" stroke="${G}" stroke-width="${i%2?1:1.8}" stroke-linecap="round"/>`; }
+  s+=`<circle cx="100" cy="160" r="18" fill="${G}"/>
+      <circle cx="106" cy="155" r="15" fill="${BG}"/>
+      <circle cx="94" cy="166" r="2" fill="${BG}"/>`;
+  // 별자리 선
+  const con=[[40,70],[58,92],[48,112],[70,118]], con2=[[160,206],[142,226],[152,246],[132,250]];
+  [con,con2].forEach(c=>{ s+=`<polyline points="${c.map(p=>p.join(",")).join(" ")}" fill="none" stroke="${G}" stroke-width=".6" opacity=".7"/>`;
+    c.forEach(([x,y])=>s+=`<circle cx="${x}" cy="${y}" r="1.8" fill="${G}"/>`); });
+  // 반짝이는 별
+  const star=(x,y,r)=>`<path d="M${x} ${y-r} Q${x} ${y} ${x+r} ${y} Q${x} ${y} ${x} ${y+r} Q${x} ${y} ${x-r} ${y} Q${x} ${y} ${x} ${y-r}z" fill="${G}"/>`;
+  s+=star(150,78,7)+star(165,110,3.5)+star(36,236,6)+star(60,262,3)+star(140,96,2.5)+star(52,210,2.5);
+  s+=`</svg>`;
+  return s;
+}
+function applyBack(){ const k=(S.shop&&S.shop.back)||"basic"; document.documentElement.style.setProperty("--back",`url("data:image/svg+xml,${encodeURIComponent(backSVG(k))}")`); document.documentElement.style.setProperty("--backbg",BACKS[k].bg); }
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+// ---- 도감 ----
+function renderBook(){
+  const g=$("grid"); g.innerHTML="";
+  let have=0, holoN=0;
+  const sg=$("seasonGrid"); sg.innerHTML="";
+  CARDS.forEach(c=>{
+    const n=S.col[c.id]||0, h=S.col[c.id+"h"]||0;
+    if(!c.season){ if(n||h) have++; if(h) holoN++; }
+    const b=document.createElement("button"); b.className="slot"+(n||h?"":" empty");
+    b.setAttribute("aria-label", n||h?`${c.name} 자세히 보기`:`아직 못 찾은 카드 ${ROMAN[c.id]}번`);
+    if(n>=3&&canHolo(c)) b.classList.add("canfuse");
+    const shown = n||h ? c : {...c,name:"???"};
+    b.innerHTML=(n+h>1?`<span class="cnt">×${n+h}</span>`:"")+cardHTML(shown,{holo:h>0});
+    b.onclick=()=>detail(c,n,h);
+    (c.season?sg:g).appendChild(b);
+  });
+  $("have").textContent=have; $("holoCnt").textContent=holoN;
+  $("barI").style.width=(have/22*100)+"%";
+  renderBadges();
+}
+function detail(c,n,h){
+  const sh=$("sheet"), rk=RANK[c.r];
+  if(c.season&&!n&&!h){ sh.innerHTML=`<h3>아직 못 찾은 한정 카드</h3><p>수능 응원 한정 카드예요. ${inSeason()?"11월 30일까지 카드를 뽑으면 5% 확률로 나와요.":"이번 시즌은 끝났어요."}</p><button class="btn" id="close">닫기</button>`; $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true; return; }
+  if(!n&&!h){
+    sh.innerHTML=`<h3>아직 못 찾은 카드</h3><p>${ROMAN[c.id]||""}번 카드 · 희귀도 <b style="color:${rk.color}">${rk.name}</b></p><p style="color:var(--muted)">카드를 뽑다 보면 만날 수 있어요.</p><button class="btn" id="close">닫기</button>`;
+  } else {
+    sh.innerHTML=`<div class="mini">${cardHTML(c,{holo:h>0})}</div>
+      <h3>${c.name} <span style="font-size:14px;color:${rk.color}">${rk.name}</span></h3>
+      <dl style="margin:0"><dt>키워드</dt><dd>${c.key}</dd>
+      <dt>바로 나왔을 때</dt><dd><p>${c.up}</p></dd>
+      <dt>거꾸로 나왔을 때</dt><dd><p>${c.rev}</p></dd>
+      <dt>가진 장수</dt><dd>보통 ${n}장 · 홀로 ${h}장</dd></dl>
+      ${!canHolo(c)?`<p style="color:var(--muted);font-size:12px">홀로 카드는 에픽 이상 카드에만 있어요.</p>`:n>=3?`<button class="btn" id="fuse">✦ 3장 합성해서 홀로 만들기</button>`:`<p style="color:var(--muted);font-size:12px">같은 카드 3장을 모으면 홀로 카드로 합성할 수 있어요 (${n}/3)</p>`}
+      <button class="btn ghost" id="close">닫기</button>`;
+  }
+  $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true; $("close").focus();
+  if($("fuse")) $("fuse").onclick=()=>{
+    S.col[c.id]-=3; S.col[c.id+"h"]=(S.col[c.id+"h"]||0)+1; S.fused=(S.fused||0)+1; save(); refresh();
+    $("modal").hidden=true; burst("holo",120); toast(`${c.name} 홀로 카드 완성!`); setTimeout(checkBadges,800);
+    setTimeout(()=>detail(c,S.col[c.id]||0,S.col[c.id+"h"]||0),700);
+  };
+}
+$("modal").onclick=e=>{ if(e.target.id==="modal") $("modal").hidden=true; };
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") $("modal").hidden=true; });
+
+// 도감 초기화 (팝업으로 확인)
+$("reset").onclick=()=>{
+  $("sheet").innerHTML=`<h3>도감을 처음부터 다시 할까요?</h3><p>모은 카드와 별가루가 모두 사라져요.</p><div class="row"><button class="btn" id="yes">네, 지울래요</button><button class="btn ghost" id="close">취소</button></div>`;
+  $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true;
+  $("yes").onclick=()=>{ S=FRESH(); S.day=today(); S.att={last:dayKey(),streak:1}; save(); applyBack(); updateMori(); refresh(); $("modal").hidden=true; toast("도감을 비웠어요"); };
+};
+
+// ---- 탭 ----
+function tab(t){
+  ["draw","book","compat","shop"].forEach(k=>{ $("tab-"+k).setAttribute("aria-selected",t===k); $("view-"+k).hidden=t!==k; });
+  window.scrollTo(0,0);
+}
+$("tab-draw").onclick=()=>tab("draw"); $("tab-book").onclick=()=>tab("book"); $("tab-compat").onclick=()=>tab("compat"); $("tab-shop").onclick=()=>{tab("shop");renderShop();}; $("dustChip").onclick=()=>{tab("shop");renderShop();};
+
+// ---- 반짝이 효과 ----
+const cv=$("fx"), cx=cv.getContext("2d"); let parts=[];
+function size(){cv.width=innerWidth;cv.height=innerHeight;} size(); addEventListener("resize",size);
+function burst(color,n,el){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const big=el||$("big"); const r=big?big.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2,width:0,height:0};
+  const ox=r.left+r.width/2, oy=r.top+r.height/2;
+  const holo=["#ff6ad5","#7af","#6fffd2","#ffe66a"];
+  for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2, s=2+Math.random()*6;
+    parts.push({x:ox,y:oy,vx:Math.cos(a)*s,vy:Math.sin(a)*s-2,life:60+Math.random()*40,c:color==="holo"?holo[i%4]:color,sz:2+Math.random()*3});}
+  if(!burst.on){burst.on=true;requestAnimationFrame(tick);}
+}
+function tick(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  parts=parts.filter(p=>p.life>0);
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.vx*=.98;p.life--;
+    cx.globalAlpha=Math.min(1,p.life/40);cx.fillStyle=p.c;cx.beginPath();
+    cx.moveTo(p.x,p.y-p.sz*2);cx.lineTo(p.x+p.sz*.6,p.y);cx.lineTo(p.x,p.y+p.sz*2);cx.lineTo(p.x-p.sz*.6,p.y);cx.fill();});
+  cx.globalAlpha=1;
+  if(parts.length) requestAnimationFrame(tick); else burst.on=false;
+}
+
+// ---- 점술사 부엉이 모리 (직접 그린 캐릭터) ----
+const MORI_BASE=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+ <ellipse cx="25" cy="88" rx="10" ry="19" fill="#4f4389" transform="rotate(18 25 88)"/>
+ <ellipse cx="95" cy="88" rx="10" ry="19" fill="#4f4389" transform="rotate(-18 95 88)"/>
+ <ellipse cx="60" cy="80" rx="36" ry="37" fill="#6b5ca8"/>
+ <ellipse cx="60" cy="100" rx="21" ry="15" fill="#9284cf"/>
+ <path d="M50 96 q4 4 8 0 M62 104 q4 4 8 0 M52 108 q3 3 6 0" stroke="#6b5ca8" stroke-width="2" fill="none" stroke-linecap="round"/>
+ <circle cx="45" cy="68" r="15" fill="#f4e8cc"/><circle cx="75" cy="68" r="15" fill="#f4e8cc"/>
+ <circle cx="45" cy="68" r="8.5" fill="#1b1630"/><circle cx="75" cy="68" r="8.5" fill="#1b1630"/>
+ <circle cx="48" cy="65" r="3" fill="#fff"/><circle cx="78" cy="65" r="3" fill="#fff"/>
+ <circle cx="43" cy="71" r="1.4" fill="#fff"/><circle cx="73" cy="71" r="1.4" fill="#fff"/>
+ <circle cx="45" cy="68" r="15" fill="none" stroke="#e7c37a" stroke-width="2.6"/>
+ <circle cx="75" cy="68" r="15" fill="none" stroke="#e7c37a" stroke-width="2.6"/>
+ <path d="M58 66 q2 -2 4 0" stroke="#e7c37a" stroke-width="2.4" fill="none"/>
+ <circle cx="33" cy="84" r="4" fill="#ff9fb8" opacity=".55"/><circle cx="87" cy="84" r="4" fill="#ff9fb8" opacity=".55"/>
+ <path d="M55 80 h10 l-5 8z" fill="#f0a534"/>
+ <path d="M50 116 l3 -5 l3 5 M64 116 l3 -5 l3 5" stroke="#f0a534" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+ <path d="M28 48 L64 4 L94 44 Q61 54 28 48z" fill="#2b3a8a" stroke="#e7c37a" stroke-width="1.6"/>
+ <path d="M64 4 q6 -2 9 4" stroke="#e7c37a" stroke-width="1.6" fill="none"/><circle cx="74" cy="9" r="3" fill="#e7c37a"/>
+ <ellipse cx="61" cy="48" rx="40" ry="7" fill="#24306f" stroke="#e7c37a" stroke-width="1.6"/>
+ <path d="M62 18 l2.4 5.2 5.6 .6 -4.2 3.8 1.2 5.6 -5 -2.9 -5 2.9 1.2 -5.6 -4.2 -3.8 5.6 -.6z" fill="#e7c37a"/>
+ <circle cx="46" cy="34" r="1.6" fill="#e7c37a"/><circle cx="78" cy="30" r="1.3" fill="#e7c37a"/>
+</svg>`;
+const HATS={blue:{name:"파란 모자",c:"#2b3a8a",b:"#24306f",price:0},red:{name:"빨간 모자",c:"#a3243a",b:"#7d1a2c",price:40},green:{name:"초록 모자",c:"#1f7a52",b:"#165c3d",price:40},pink:{name:"분홍 모자",c:"#d9609a",b:"#b04479",price:40}};
+const ACCS={scarf:{name:"빨간 목도리",price:40},band:{name:"수능 응원 머리띠",price:40},glasses:{name:"반짝 별 안경테",price:40}};
+function moriSVG(){
+  const sh=S.shop||{}; const H=HATS[sh.hat]||HATS.blue, w=sh.wear||{};
+  let m=MORI_BASE.split("#2b3a8a").join(H.c).split("#24306f").join(H.b);
+  if(w.glasses) m=m.split('stroke="#e7c37a" stroke-width="2.6"').join('stroke="#ff9be8" stroke-width="3.2"');
+  let add="";
+  if(w.scarf) add+=`<path d="M30 94 Q60 108 90 94 L92 102 Q60 118 28 102Z" fill="#d8344c"/><path d="M76 100 l8 20 l-9 -2 l-5 -16z" fill="#b8263c"/><path d="M36 99 Q60 110 84 99" stroke="#ffd3d9" stroke-width="2" fill="none" stroke-dasharray="3 4"/>`;
+  if(w.band) add+=`<path d="M22 47 Q61 57 100 47 L101 56 Q61 66 21 56Z" fill="#fff" stroke="#e8e8e8" stroke-width="1"/><circle cx="61" cy="56" r="6.5" fill="#e03a3a"/><text x="61" y="59" font-size="6" font-weight="700" fill="#fff" text-anchor="middle" font-family="sans-serif">합격</text><path d="M100 50 l10 -6 l-2 10z M100 53 l11 4 l-9 4z" fill="#fff" stroke="#e8e8e8" stroke-width=".8"/>`;
+  return m.replace("</svg>",add+"</svg>");
+}
+let MORI_SVG=MORI_BASE;
+function updateMori(){ MORI_SVG=moriSVG(); $("owl").innerHTML=MORI_SVG; $("owl2").innerHTML=MORI_SVG; }
+
+// ---- 공유 이미지 ----
+let lastRes=null;
+const loadImg=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src;});
+function wrapText(ctx,text,maxW){
+  const out=[];let line="";
+  for(const ch of text){ const t=line+ch; if(ctx.measureText(t).width>maxW&&line){out.push(line);line=ch.trim()?ch:"";} else line=t; }
+  if(line) out.push(line); return out;
+}
+async function makeShare(){
+  if(!lastRes) return;
+  const {card,rev,holo,q}=lastRes, rk=RANK[card.r];
+  const sumEl=$("summary"), text=(sumEl&&!sumEl.classList.contains("wait")?sumEl.textContent:(rev?card.rev:card.up)).trim();
+  const W=1080,H=1350, cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  const c=cv.getContext("2d");
+  try{ await document.fonts.ready; }catch(e){}
+  const F1='"Gowun Batang", serif', F2='"Noto Sans KR", sans-serif';
+  // 배경
+  const g=c.createLinearGradient(0,0,0,H); g.addColorStop(0,"#151c42"); g.addColorStop(1,"#0a0e20"); c.fillStyle=g; c.fillRect(0,0,W,H);
+  let seed=card.id*97+7; const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+  for(let i=0;i<140;i++){c.globalAlpha=.25+rnd()*.6;c.fillStyle="#fff";c.beginPath();c.arc(rnd()*W,rnd()*H,rnd()*1.8+.3,0,7);c.fill();}
+  c.globalAlpha=1;
+  c.strokeStyle="#e7c37a"; c.lineWidth=4; c.strokeRect(28,28,W-56,H-56); c.lineWidth=1.5; c.strokeRect(42,42,W-84,H-84);
+  // 제목
+  c.textAlign="center"; c.fillStyle="#e7c37a"; c.font=`700 46px ${F1}`; c.fillText("별빛 타로 도감",W/2,118);
+  c.fillStyle="#9aa0bf"; c.font=`400 26px ${F2}`; c.fillText(new Date().toLocaleDateString("ko-KR",{year:"numeric",month:"long",day:"numeric"})+"의 카드",W/2,162);
+  // 카드
+  const cw=400,ch=640,cx0=W/2-cw/2,cy0=200;
+  if(card.r==="l"){ c.save(); c.translate(W/2,cy0+ch/2); const rg=c.createRadialGradient(0,0,60,0,0,620); rg.addColorStop(0,"#ffd978aa"); rg.addColorStop(1,"#ffd97800");
+    c.fillStyle=rg; for(let i=0;i<28;i++){ c.rotate(Math.PI*2/28); c.beginPath(); c.moveTo(0,0); c.lineTo(640,-38); c.lineTo(640,38); c.closePath(); c.fill(); } c.restore(); }
+  c.save(); c.shadowColor=rk.color; c.shadowBlur=card.r==="n"?20:60;
+  c.fillStyle="#121836"; roundRect(c,cx0,cy0,cw,ch,24); c.fill(); c.restore();
+  if(card.r==="l"){ const fg=c.createLinearGradient(cx0,cy0,cx0+cw,cy0+ch); ["#fff6c8","#e7b84a","#8a5a12","#ffe9a0","#c98b1e","#fff6c8"].forEach((col,i,a)=>fg.addColorStop(i/(a.length-1),col));
+    c.lineWidth=14; c.strokeStyle=fg; } else { c.lineWidth=7; c.strokeStyle=rk.color; }
+  roundRect(c,cx0,cy0,cw,ch,24); c.stroke();
+  const art=ART(card.id);
+  if(art){ const im=await loadImg(art); const ax=cx0+22, ay=cy0+52, aw=cw-44, ah=ch-150;
+    c.save(); roundRect(c,ax,ay,aw,ah,10); c.clip();
+    const sc=Math.max(aw/im.width,ah/im.height), dw=im.width*sc, dh=im.height*sc;
+    if(rev){ c.translate(ax+aw/2,ay+ah/2); c.rotate(Math.PI); c.drawImage(im,-dw/2,-dh/2,dw,dh); }
+    else c.drawImage(im,ax+(aw-dw)/2,ay+(ah-dh)/2,dw,dh);
+    c.restore();
+    if(holo){ c.save(); roundRect(c,ax,ay,aw,ah,10); c.clip(); c.globalCompositeOperation="color-dodge"; c.globalAlpha=.45;
+      const hg=c.createLinearGradient(ax,ay,ax+aw,ay+ah); ["#ff6ad5","#77aaff","#6fffd2","#ffe66a"].forEach((col,i)=>hg.addColorStop(i/3,col)); c.fillStyle=hg; c.fillRect(ax,ay,aw,ah); c.restore(); }
+  }
+  c.fillStyle=rk.color; c.font=`700 26px ${F1}`; c.textAlign="left"; c.fillText(ROMAN[card.id],cx0+24,cy0+38);
+  c.textAlign="right"; if(holo) c.fillText("✦ HOLO",cx0+cw-24,cy0+38);
+  c.textAlign="center"; c.fillStyle="#ece8dc"; c.font=`700 44px ${F1}`; c.fillText(card.name,W/2,cy0+ch-50);
+  c.fillStyle=rk.color; c.font=`500 22px ${F2}`; c.fillText(`${rk.name} · ${rk.en}${rev?" · 거꾸로":""}`,W/2,cy0+ch-18);
+  // 고민 + 풀이
+  let y=cy0+ch+70;
+  if(q){ c.fillStyle="#9aa0bf"; c.font=`400 28px ${F2}`; const ql=wrapText(c,"나의 고민: "+q,W-200); ql.slice(0,2).forEach(l=>{c.fillText(l,W/2,y);y+=40;}); y+=10; }
+  c.fillStyle="#ece8dc"; c.font=`400 32px ${F2}`;
+  let lines=wrapText(c,text,W-220); const maxL=Math.floor((H-150-y)/48);
+  if(lines.length>maxL){ lines=lines.slice(0,maxL); lines[maxL-1]=lines[maxL-1].slice(0,-1)+"…"; }
+  lines.forEach(l=>{c.fillText(l,W/2,y);y+=48;});
+  // 모리 + 바닥글
+  const owl=await loadImg("data:image/svg+xml,"+encodeURIComponent(MORI_SVG));
+  c.drawImage(owl,70,H-190,120,120);
+  c.textAlign="left"; c.fillStyle="#e7c37a"; c.font=`700 28px ${F1}`; c.fillText("점술사 모리가 봐 줬어요",200,H-120);
+  c.fillStyle="#9aa0bf"; c.font=`400 22px ${F2}`; c.fillText("나도 카드 뽑아 보기 · 별빛 타로 도감",200,H-84);
+
+  cv.toBlob(async blob=>{
+    if(!blob){ toast("이미지를 만들지 못했어요. 다시 눌러 주세요"); return; }
+    const url=URL.createObjectURL(blob);
+    const dl=await getDownloads();
+    $("sheet").innerHTML=`<h3>공유 이미지</h3><img class="share-img" src="${url}" alt="${card.name} 카드 결과 이미지">
+      <p style="color:var(--muted);font-size:13px">${dl||!window.claude?"저장한 뒤 인스타그램이나 카톡에 올려 보세요. 휴대폰에서는 이미지를 길게 눌러도 저장돼요.":"휴대폰에서는 이미지를 길게 눌러 저장할 수 있어요."}</p>
+      <div class="row">${dl?'<button class="btn" id="save">이미지 저장</button>':!window.claude?`<a class="btn" href="${url}" download="별빛타로_${card.name}.png" style="text-decoration:none">이미지 저장</a>`:""}<button class="btn ghost" id="close">닫기</button></div>`;
+    $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true;
+    if(dl) $("save").onclick=async()=>{
+      try{ await dl.save({filename:`별빛타로_${card.name}.png`,data:blob}); toast("저장했어요!"); }
+      catch(e){ if(e&&e.code==="declined") return; toast("여기서는 저장할 수 없어요. 이미지를 길게 눌러 저장해 주세요"); }
+    };
+  },"image/png");
+}
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+let dlP=null;
+function getDownloads(){ if(!dlP) dlP=(window.claude&&window.claude.use)?Promise.race([window.claude.use("downloads").catch(()=>null),new Promise(r=>setTimeout(()=>r(null),3000))]):Promise.resolve(null); return dlP; }
+
+// ---- 제작자 모드: 제목을 빠르게 5번 누르면 열려요 ----
+let tapN=0, tapT=0;
+$("title").addEventListener("click",()=>{
+  const now=Date.now(); tapN=(now-tapT<1200)?tapN+1:1; tapT=now;
+  if(tapN>=5){ tapN=0; askDev(); }
+});
+const DEV_HASH=1084304462;
+function askDev(){
+  let ok=false; try{ ok=sessionStorage.getItem("starDev")==="1"; }catch(e){}
+  if(ok) return openDev();
+  $("sheet").innerHTML=`<h3>제작자 확인</h3><label for="devpw" style="font-size:13px;color:var(--muted)">비밀번호</label>
+    <input id="devpw" type="password" autocomplete="off" style="background:#0f1530;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;font-size:15px">
+    <div class="row"><button class="btn" id="devok">확인</button><button class="btn ghost" id="close">닫기</button></div>`;
+  $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true; $("devpw").focus();
+  const go=()=>{ if(hashStr($("devpw").value.trim())===DEV_HASH){ try{sessionStorage.setItem("starDev","1");}catch(e){} openDev(); } else toast("비밀번호가 달라요"); };
+  $("devok").onclick=go; $("devpw").onkeydown=e=>{ if(e.key==="Enter") go(); };
+}
+function openDev(){
+  $("sheet").innerHTML=`<h3>제작자 모드</h3><p style="color:var(--muted);font-size:13px">테스트용이에요. 이 기기에만 적용돼요.</p>
+    <div class="row"><button class="btn" id="dv1">뽑기 5번 충전</button><button class="btn" id="dv2">별가루 +50</button></div>
+    <div class="row"><button class="btn ghost" id="dv4">확정권 +1</button><button class="btn ghost" id="dv5">천장 직전으로</button></div>
+    <div class="row"><button class="btn ghost" id="dv3">뽑기 100번 충전</button><button class="btn ghost" id="close">닫기</button></div>`;
+  $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true;
+  const add=(d,u)=>{ S.draws+=d; S.dust+=u; save(); refresh(); toast(d?`뽑기 ${d}번 충전했어요`:`별가루 ${u}개 충전했어요`); if(!document.querySelector(".back")&&S.draws>0) deal(); };
+  $("dv1").onclick=()=>add(5,0); $("dv2").onclick=()=>add(0,50); $("dv3").onclick=()=>add(100,0);
+  $("dv4").onclick=()=>{S.tickets++;save();refresh();toast("확정권 1장 충전");};
+  $("dv5").onclick=()=>{S.pity=PITY-1;save();refresh();toast("다음 뽑기는 전설 확정");};
+}
+
+// ================= 새 기능 =================
+const dayKey=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+// ---- 한정 카드 그림 (직접 그린 그림) ----
+(function(){
+  const W=270,H=415, G="#ffd978", M="#5ff2c6";
+  let st=""; let sd=7; const r=()=>{sd=(sd*9301+49297)%233280;return sd/233280;};
+  for(let i=0;i<60;i++) st+=`<circle cx="${(r()*W).toFixed(0)}" cy="${(r()*H*.75).toFixed(0)}" r="${(r()*1.6+.4).toFixed(1)}" fill="#fff" opacity="${(.3+r()*.7).toFixed(2)}"/>`;
+  const leaf=(x,y,a,f)=>`<ellipse cx="${x}" cy="${y}" rx="11" ry="4.5" fill="${f}" transform="rotate(${a} ${x} ${y})"/>`;
+  let laurel=""; for(let i=0;i<7;i++){ const t=i/6, x1=60+t*48, y1=372-Math.sin(t*Math.PI)*-10-t*70; laurel+=leaf(x1.toFixed(0),y1.toFixed(0),-50+t*25,i%2?"#7fe8c8":"#4fcfa8"); laurel+=leaf((W-x1).toFixed(0),y1.toFixed(0),50-t*25,i%2?"#7fe8c8":"#4fcfa8"); }
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#071a2e"/><stop offset=".6" stop-color="#0c3a4a"/><stop offset="1" stop-color="#145a5a"/></linearGradient>
+    <linearGradient id="tail" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${M}" stop-opacity="0"/><stop offset="1" stop-color="#fff8d0"/></linearGradient>
+    <radialGradient id="glo" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff6c8"/><stop offset=".35" stop-color="${G}" stop-opacity=".7"/><stop offset="1" stop-color="${G}" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="${W}" height="${H}" fill="url(#sky)"/>${st}
+  <path d="M-10 40 Q90 120 182 168" stroke="url(#tail)" stroke-width="16" fill="none" stroke-linecap="round" opacity=".55"/>
+  <path d="M10 70 Q100 135 182 168" stroke="url(#tail)" stroke-width="6" fill="none" stroke-linecap="round" opacity=".8"/>
+  <circle cx="186" cy="170" r="62" fill="url(#glo)"/>
+  <path d="M186 128 L197 159 L229 160 L203 179 L213 210 L186 191 L159 210 L169 179 L143 160 L175 159Z" fill="#fff3b8" stroke="${G}" stroke-width="2"/>
+  <g transform="translate(0,-62)">
+  <path d="M30 300 Q135 260 240 300 L240 330 Q135 296 30 330Z" fill="#0b2b36" opacity=".7"/>
+  <path d="M135 352 L72 330 Q70 300 74 296 L135 316Z" fill="#f4ecd6"/><path d="M135 352 L198 330 Q200 300 196 296 L135 316Z" fill="#e8dcc0"/>
+  <path d="M135 316 L135 352" stroke="#b9a984" stroke-width="1.5"/>
+  ${[0,1,2,3].map(i=>`<path d="M${84+i*0} ${306+i*9} L128 ${321+i*9}" stroke="#b9a984" stroke-width="1.2"/><path d="M${142} ${321+i*9} L186 ${306+i*9}" stroke="#b9a984" stroke-width="1.2"/>`).join("")}
+  ${laurel}
+  </g>
+  <path d="M120 238 l4 9 10 1 -8 6 3 10 -9 -5 -9 5 3 -10 -8 -6 10 -1z" fill="${M}" opacity=".9"/>
+  <path d="M60 210 l2.5 6 6 .5 -4.6 4 1.5 6 -5.4 -3.2 -5.4 3.2 1.5 -6 -4.6 -4 6 -.5z" fill="${G}" opacity=".85"/>
+  <path d="M230 260 l2 5 5 .4 -3.8 3.3 1.2 5 -4.4 -2.6 -4.4 2.6 1.2 -5 -3.8 -3.3 5 -.4z" fill="${G}" opacity=".8"/>
+  </svg>`;
+  (window.CARD_ART=window.CARD_ART||{})[22]="data:image/svg+xml,"+encodeURIComponent(svg);
+})();
+
+// ---- 과거·현재·미래 3장 뽑기 ----
+const POS=["과거","현재","미래"];
+function pickThree(b,fan){
+  if(b.classList.contains("taken")) return;
+  if(picks.length===0){
+    while(S.draws<2&&S.dust>=DUST_COST){ S.dust-=DUST_COST; S.draws+=1; }
+    if(S.draws<2){ refresh(); say("세 장 뽑기는 뽑기가 2번 필요해. 내일 다시 오거나 별가루를 모아 줘!"); return; }
+    S.draws-=2; save(); refresh(); }
+  b.classList.add("taken","gone"); setT(b,{ty:"-120px",sc:.6,ry:"180deg"});
+  picks.push(roll());
+  if(picks.length<3){ say(`${POS[picks.length-1]} 카드를 골랐어. 이제 ${POS[picks.length]} 카드를 골라 줘!`); return; }
+  busy=true; say("세 장이 모였어! 한 장씩 눌러서 뒤집어 봐.");
+  const res=picks.slice(); setTimeout(()=>showSpread(res),RM()?100:500);
+}
+function showSpread(res){
+  const stage=$("stage");
+  stage.innerHTML=`<div class="spread">${res.map((x,i)=>`<div class="sp"><div class="lbl">${POS[i]}</div>
+    <div class="big enter${x.card.r==="l"?" lg":""}" id="sp${i}" role="button" tabindex="0" aria-label="${POS[i]} 카드 뒤집기" style="animation-delay:${i*120}ms">
+      ${x.card.r==="l"?'<div class="rays" aria-hidden="true"></div>':""}
+      <div class="glow" style="background:${RANK[x.card.r].color};opacity:${x.card.r==="n"?0:x.card.r==="r"?.3:.7}"></div>
+      <div class="float"><div class="tilt"><div class="inner"><div class="face b"></div><div class="face f">${cardHTML(x.card,{rev:x.rev,holo:x.holo})}</div></div></div></div>
+    </div></div>`).join("")}</div>`;
+  let opened=0;
+  res.forEach((x,i)=>{
+    const el=$("sp"+i), fancy="els".includes(x.card.r); let done=false;
+    attachTilt(el,el); if(fancy) el.classList.add("charge");
+    const flip=()=>{ if(done) return; done=true; el.classList.remove("charge"); if(fancy) el.classList.add("spin"); el.classList.add("flipped");
+      setTimeout(()=>{ el.classList.add("pop"); if(fancy||x.holo) burst(x.holo?"holo":RANK[x.card.r].color,60,el);
+        opened++; if(opened===3) setTimeout(()=>revealSpread(res),400); }, RM()?50:(fancy?1300:750)); };
+    el.onclick=flip; el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();flip();}};
+  });
+}
+function revealSpread(res){
+  const got=res.map(x=>addCard(x)); refresh(); busy=false; setTimeout(checkBadges,900);
+  const q=$("q").value.trim(), r=$("result");
+  const best=res.reduce((a,x)=>"nreslh".indexOf(x.card.r)>"nreslh".indexOf(a)?x.card.r:a,"n");
+  say(best==="l"?"세 장 중에 전설 카드가 있어! 대단한 흐름이야!":"과거에서 미래까지 이어지는 이야기가 보여.");
+  const newN=got.filter(g=>g.first).length, dust=got.reduce((a,g)=>a+g.gained,0);
+  const sum=`과거의 ${res[0].card.name}, 현재의 ${res[1].card.name}, 미래의 ${res[2].card.name}`;
+  r.innerHTML=`${q?`<div class="q">나의 고민: ${esc(q)}</div>`:""}
+    <h2>과거 · 현재 · 미래</h2>
+    <div class="tags">${res.map((x,i)=>`<span class="tag" style="color:${RANK[x.card.r].color}">${POS[i]} ${x.card.name}${x.rev?" (거꾸로)":""}</span>`).join("")}</div>
+    <p class="summary wait" id="summary"><span class="dots">모리가 세 장의 흐름을 읽고 있어</span></p>
+    <p style="font-size:14px">${newN?`<span class="new">✦ 새 카드 ${newN}장을 도감에 추가했어요.</span> `:""}${dust?`겹친 카드는 별가루 ${dust}개로 바꿨어요.`:""}</p>
+    <button class="more-btn" id="moreBtn" aria-expanded="false">자세히 보기 ▾</button>
+    <div class="more" id="more" hidden>
+      <p id="detail" class="wait">자세한 풀이를 준비하고 있어…</p>
+      <div class="spread-rows">${res.map((x,i)=>`<div><b>${POS[i]}</b><span>${x.card.name} · ${x.card.key}<br><span style="color:var(--muted)">${x.rev?x.card.rev:x.card.up}</span></span></div>`).join("")}</div>
+    </div>
+    <div class="row"><button class="btn" id="again">한 번 더</button><button class="btn ghost" id="toBook">도감 보기</button></div>`;
+  r.hidden=false;
+  $("again").onclick=()=>{ $("shuffle").click(); window.scrollTo({top:0,behavior:"smooth"}); };
+  $("toBook").onclick=()=>tab("book");
+  $("moreBtn").onclick=()=>{ const m=$("more"), open=m.hidden; m.hidden=!open; $("moreBtn").setAttribute("aria-expanded",open); $("moreBtn").textContent=open?"접기 ▴":"자세히 보기 ▾"; };
+  const desc=res.map((x,i)=>`${POS[i]}: ${x.card.name} (${x.rev?"거꾸로":"바로"}, 키워드 ${x.card.key}, 기본 뜻: ${x.rev?x.card.rev:x.card.up})`).join("\n");
+  const prompt=`너는 타로 앱의 귀여운 점술사 부엉이 '모리'야. 친근한 반말로, 학생도 쉽게 이해할 수 있게 말해.
+사용자의 고민: ${q?`"${q}"`:"따로 없음 (요즘의 전반적인 흐름을 봐 줘)"}
+과거·현재·미래 세 장 뽑기 결과:
+${desc}
+
+아래 형식 그대로 답해.
+요약: 세 카드가 이어지는 흐름을 4~5문장, 180~220자 정도로. 과거에서 현재를 거쳐 미래로 어떻게 이어지는지와 응원 한마디까지.
+자세히: 카드마다 고민과 연결해서 두 문장씩 풀어 주고, 마지막에 오늘 해 볼 작은 행동 하나를 추천해. 5~7문장.
+겁주거나 단정하지 말고 따뜻하게. 인사말, 이모지, 따옴표 없이.`;
+  const fb={short:`${sum}. ${res[0].card.key}에서 시작해서 지금은 ${res[1].card.key}의 시기를 지나고 있고, 앞으로는 ${res[2].card.key}이(가) 기다리고 있어. ${res[2].rev?"조금 조심하면서 천천히 가면 괜찮아.":"좋은 방향으로 흘러가고 있으니 자신 있게 가 봐!"}`, detail:null};
+  aiRead(prompt,$("summary"),$("detail"),fb);
+  lastRes=res[1];
+}
+
+function flash(){ if(RM()) return; const f=document.createElement("div"); f.style.cssText="position:fixed;inset:0;z-index:35;pointer-events:none;background:radial-gradient(circle,#fff8dc,#ffcf4a88 40%,transparent 75%);opacity:1;transition:opacity .9s ease";
+  document.body.appendChild(f); requestAnimationFrame(()=>requestAnimationFrame(()=>f.style.opacity=0)); setTimeout(()=>f.remove(),1000); }
+// ---- 공통: Claude에게 풀이 받기 ----
+async function aiRead(prompt,sum,det,fb){
+  const show=(sh,dt)=>{ if(!sum.isConnected)return; if(sh){sum.classList.remove("wait");sum.textContent=sh;} if(det&&dt&&det.isConnected){det.classList.remove("wait");det.textContent=dt;} };
+  const fail=()=>{ show(fb.short,fb.detail); if(!fb.detail&&det&&det.isConnected) det.remove(); };
+  const sample=await getSampler(); if(!sample){ fail(); return; }
+  const parse=t=>{ t=t.replace(/\*\*/g,""); const i=t.indexOf("자세히:"); return {sh:(i<0?t:t.slice(0,i)).replace(/^\s*요약:\s*/,"").trim(), dt:i<0?"":t.slice(i+4).trim()}; };
+  try{
+    const r=await sample(prompt,{modelTier:"quick",onText:({text})=>{ if(text&&!/^Thinking/.test(text)){ const x=parse(text); show(x.sh,x.dt); } }});
+    if(r&&r.text){ const x=parse(r.text); if(x.sh) show(x.sh,x.dt); else fail(); } else fail();
+  }catch(e){ fail(); }
+}
+
+// ---- 업적 배지 ----
+const owned=id=>(S.col[id]||0)+(S.col[id+"h"]||0)>0;
+const BADGES=[
+  {id:"first",ic:"●",name:"첫 카드",desc:"카드 1장 모으기",ok:()=>BASE.some(c=>owned(c.id))},
+  {id:"rare",ic:"◆",name:"레어 수집가",desc:"레어 카드 7장 모두",ok:()=>BASE.filter(c=>c.r==="r").every(c=>owned(c.id))},
+  {id:"epic",ic:"★",name:"에픽 마스터",desc:"에픽 카드 5장 모두",ok:()=>BASE.filter(c=>c.r==="e").every(c=>owned(c.id))},
+  {id:"legend",ic:"♛",name:"전설의 주인",desc:"전설 카드 3장 모두",ok:()=>BASE.filter(c=>c.r==="l").every(c=>owned(c.id))},
+  {id:"holo",ic:"✦",name:"반짝반짝",desc:"에픽 이상 홀로 카드 3종류",ok:()=>CARDS.filter(c=>canHolo(c)&&S.col[c.id+"h"]).length>=3},
+  {id:"fuse",ic:"⚗",name:"연금술사",desc:"카드 첫 합성",ok:()=>(S.fused||0)>=1},
+  {id:"season",ic:"✎",name:"수능 응원단",desc:"한정 '합격의 별' 얻기",ok:()=>owned(22)},
+  {id:"streak",ic:"7",name:"7일 개근",desc:"7일 연속 출석",ok:()=>S.att&&S.att.streak>=7},
+  {id:"hundred",ic:"百",name:"백 번의 운명",desc:"카드 100번 뽑기",ok:()=>(S.total||0)>=100},
+  {id:"complete",ic:"♾",name:"도감 완성",desc:"22장 모두 모으기",ok:()=>BASE.every(c=>owned(c.id))}
+];
+function checkBadges(){
+  const news=BADGES.filter(b=>!S.badges[b.id]&&b.ok());
+  news.forEach(b=>S.badges[b.id]=dayKey());
+  if(news.length){ save(); renderBadges(); toast(`업적 달성! ${news.map(b=>b.name).join(", ")}`); burst("#e7c37a",60); }
+}
+function renderBadges(){
+  const el=$("badges"); if(!el) return;
+  el.innerHTML=BADGES.map(b=>`<div class="badge${S.badges[b.id]?" on":""}"><i aria-hidden="true">${b.ic}</i><span><b>${b.name}</b><small>${b.desc}</small></span></div>`).join("");
+  $("badgeCnt").textContent=`${Object.keys(S.badges).length} / ${BADGES.length}`;
+}
+
+// ---- 출석 체크 ----
+function attendance(){
+  const t=dayKey(), y=dayKey(new Date(Date.now()-864e5));
+  if(S.att.last===t) return;
+  let st=S.att.last===y?S.att.streak+1:1; if(st>7) st=1;
+  S.att={last:t,streak:st};
+  const reward=st===7?"에픽 이상 확정권 1장":`별가루 ${st===3||st===5?5:3}개`;
+  if(st===7) S.tickets++; else S.dust+=(st===3||st===5?5:3);
+  save(); refresh(); setTimeout(checkBadges,1200);
+  const days=[1,2,3,4,5,6,7].map(d=>`<div class="${d<=st?"done":""}${d===st?" today":""}${d===7?" big7":""}"><span>${d===7?"★":d}</span>${d===7?"확정권":(d===3||d===5?"별가루5":"별가루3")}</div>`).join("");
+  $("sheet").innerHTML=`<h3>출석 ${st}일째!</h3><p>오늘의 출석 보상으로 <b style="color:var(--gold)">${reward}</b>을(를) 받았어요.</p>
+    <div class="att">${days}</div>
+    <p style="color:var(--muted);font-size:12px">하루라도 빠지면 1일째부터 다시 시작해요. 7일째에는 에픽 이상 확정권을 줘요!</p>
+    <button class="btn" id="close">좋아요</button>`;
+  $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true;
+}
+
+// ---- 궁합 타로 ----
+function hashStr(t){ let h=2166136261; for(const ch of t){ h^=ch.codePointAt(0); h=Math.imul(h,16777619); } return h>>>0; }
+function seeded(n){ return ()=>{ n|=0; n=n+0x6D2B79F5|0; let t=Math.imul(n^n>>>15,1|n); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+$("compatGo").onclick=()=>{
+  const a=$("nA").value.trim(), b=$("nB").value.trim();
+  if(!a||!b){ $("say2").textContent="두 사람 이름을 모두 적어 줘!"; return; }
+  const key=[a,b].sort().join("♥")+dayKey(), rnd=seeded(hashStr(key));
+  const pickC=()=>({card:BASE[Math.floor(rnd()*BASE.length)], rev:rnd()<.3});
+  const A=pickC(); let B=pickC(); if(B.card.id===A.card.id) B={card:BASE[(A.card.id+7)%BASE.length],rev:B.rev};
+  let score=55+Math.floor(rnd()*36); if(!A.rev&&!B.rev) score+=5; if(A.rev&&B.rev) score-=6; score=Math.max(42,Math.min(99,score));
+  const st=$("compatStage");
+  st.innerHTML=`<div class="pair">${[[a,A],[b,B]].map(([nm,x],i)=>`<div class="sp"><div class="lbl">${esc(nm)}</div>
+    <div class="big enter" id="cp${i}" style="animation-delay:${i*150}ms"><div class="glow" style="background:#ff9fb8;opacity:.35"></div>
+    <div class="float"><div class="tilt"><div class="inner"><div class="face b"></div><div class="face f">${cardHTML(x.card,{rev:x.rev})}</div></div></div></div></div></div>`).join("")}</div>`;
+  [0,1].forEach(i=>attachTilt($("cp"+i),$("cp"+i)));
+  $("compatResult").hidden=true; $("say2").textContent="두 사람의 카드를 뽑았어. 뒤집어 볼게!";
+  setTimeout(()=>$("cp0").classList.add("flipped"),RM()?0:700);
+  setTimeout(()=>$("cp1").classList.add("flipped"),RM()?0:1100);
+  setTimeout(()=>showCompat(a,b,A,B,score),RM()?50:1900);
+};
+function showCompat(a,b,A,B,score){
+  const r=$("compatResult");
+  const band=score>=85?"찰떡궁합":score>=70?"좋은 짝꿍":score>=58?"서로 배우는 사이":"알아 가는 중";
+  $("say2").textContent=score>=85?"와, 이건 찰떡궁합이야!":"두 사람만의 특별한 궁합이 보여.";
+  r.innerHTML=`<div class="meter"><div class="num" id="scoreNum">0</div><div style="font-size:14px;color:#ff9fb8">${band}</div><div class="bar"><i id="scoreBar" style="width:0%"></i></div></div>
+    <p class="summary wait" id="cSummary"><span class="dots">모리가 두 사람의 카드를 읽고 있어</span></p>
+    <button class="more-btn" id="cMoreBtn" aria-expanded="false">자세히 보기 ▾</button>
+    <div class="more" id="cMore" hidden><p id="cDetail" class="wait">자세한 풀이를 준비하고 있어…</p>
+      <div class="spread-rows"><div><b>${esc(a)}</b><span>${A.card.name}${A.rev?" (거꾸로)":""} · ${A.card.key}</span></div><div><b>${esc(b)}</b><span>${B.card.name}${B.rev?" (거꾸로)":""} · ${B.card.key}</span></div></div></div>`;
+  r.hidden=false;
+  $("cMoreBtn").onclick=()=>{ const m=$("cMore"), open=m.hidden; m.hidden=!open; $("cMoreBtn").setAttribute("aria-expanded",open); $("cMoreBtn").textContent=open?"접기 ▴":"자세히 보기 ▾"; };
+  let v=0; const step=()=>{ v=Math.min(score,v+2); $("scoreNum").textContent=v+"점"; $("scoreBar").style.width=v+"%"; if(v<score) requestAnimationFrame(step); else if(score>=85) burst("#ff9fb8",80,$("scoreNum")); };
+  if(RM()){ v=score-0; } step();
+  const prompt=`너는 타로 앱의 귀여운 점술사 부엉이 '모리'야. 친근한 반말로, 학생도 쉽게 이해할 수 있게 말해.
+두 사람의 궁합을 타로로 봐 줘. 두 사람은 친구, 가족, 연인 누구든 될 수 있으니 관계를 단정하지 마.
+${a}의 카드: ${A.card.name} (${A.rev?"거꾸로":"바로"}, 키워드 ${A.card.key})
+${b}의 카드: ${B.card.name} (${B.rev?"거꾸로":"바로"}, 키워드 ${B.card.key})
+궁합 점수: ${score}점 (${band})
+
+아래 형식 그대로 답해.
+요약: 두 사람이 어떤 사이인지 4~5문장, 180~220자 정도로. 두 이름을 넣고, 서로의 좋은 점을 짚어 줘.
+자세히: 두 카드가 만나서 생기는 힘과 서로 조심하면 좋은 점, 그리고 둘이 함께 해 보면 좋은 활동 하나를 추천해. 4~6문장.
+점수가 낮아도 상처 주지 말고 따뜻하게. 인사말, 이모지, 따옴표 없이.`;
+  aiRead(prompt,$("cSummary"),$("cDetail"),{short:`${a}의 ${A.card.name} 카드는 '${A.card.key}', ${b}의 ${B.card.name} 카드는 '${B.card.key}'을(를) 말해. 서로 다른 점이 있어서 오히려 채워 줄 수 있는 사이야. ${score>=70?"함께 있으면 힘이 나는 조합이니까 지금처럼 자주 이야기 나눠 봐!":"천천히 알아 가면 더 가까워질 수 있어. 먼저 따뜻한 말 한마디 건네 보자!"}`,detail:null});
+}
+
+// ================= 모리의 별가루 상점 =================
+const PRICE={draw:10,ticket:120,n:30,r:60,e:150};
+let exRank="n";
+function confirmBuy(title,cost,onYes){
+  if(S.dust<cost){ toast(`별가루가 ${cost-S.dust}개 모자라요`); return; }
+  $("sheet").innerHTML=`<h3>${title}</h3><p>별가루 <b style="color:var(--gold)">${cost}개</b>를 써요. 사고 나면 <b>${S.dust-cost}개</b>가 남아요.</p>
+    <div class="row"><button class="btn" id="yes">살게요</button><button class="btn ghost" id="close">취소</button></div>`;
+  $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true;
+  $("yes").onclick=()=>{ S.dust-=cost; onYes(); save(); refresh(); $("modal").hidden=true; setTimeout(checkBadges,600); };
+}
+function item(ic,name,desc,btn){ return `<div class="item"><span class="ic" aria-hidden="true">${ic}</span><span class="tx"><b>${name}</b><small>${desc}</small></span>${btn}</div>`; }
+function renderShop(){
+  if(!$("shopDraw")) return;
+  $("shopDust").textContent=S.dust;
+  $("owl3").innerHTML=MORI_SVG;
+  $("shopDraw").innerHTML=
+    item("✦","뽑기 1번","오늘 뽑기를 다 썼을 때",`<button class="price" data-buy="draw" ${S.dust<PRICE.draw?"disabled":""}>${PRICE.draw}</button>`)+
+    item("★","에픽 이상 확정권",`에픽이나 전설이 꼭 나와요 · 가진 확정권 ${S.tickets}장`,`<button class="price" data-buy="ticket" ${S.dust<PRICE.ticket?"disabled":""}>${PRICE.ticket}</button>`);
+  // 카드 교환
+  ["n","r","e"].forEach(k=>$("ex-"+k).setAttribute("aria-checked",exRank===k));
+  const cs=BASE.filter(c=>c.r===exRank).sort((a,b)=>owned(a.id)-owned(b.id));
+  $("shopCards").innerHTML="";
+  cs.forEach(c=>{ const b=document.createElement("button"); b.className="slot shopc";
+    b.innerHTML=(owned(c.id)?`<span class="tagown">보유</span>`:`<span class="tagnew">미보유</span>`)+cardHTML(c);
+    b.setAttribute("aria-label",`${c.name} 교환하기, 별가루 ${PRICE[exRank]}개`);
+    b.onclick=()=>confirmBuy(`${c.name} 카드로 교환할까요?`,PRICE[exRank],()=>{ S.col[c.id]=(S.col[c.id]||0)+1; toast(`${c.name} 카드를 받았어요!`); burst(RANK[c.r].color,50,b); });
+    $("shopCards").appendChild(b); });
+  // 카드 뒷면
+  const sh=S.shop;
+  $("shopBacks").innerHTML=Object.entries(BACKS).map(([k,v])=>{ const have=sh.backs.includes(k), on=sh.back===k;
+    return `<button class="bk${on?" on":""}" data-back="${k}" aria-label="${v.name} ${on?"사용 중":have?"쓰기":"별가루 "+v.price+"개"}"><span class="pv" style="background-image:url('data:image/svg+xml,${encodeURIComponent(backSVG(k)).replace(/'/g,"%27")}')"></span>${v.name}<small>${on?"사용 중":have?"눌러서 쓰기":"별가루 "+v.price}</small></button>`; }).join("");
+  // 모리
+  $("moriPrev").innerHTML=MORI_SVG;
+  const w=sh.wear||{};
+  $("shopMori").innerHTML=Object.entries(HATS).map(([k,v])=>{ const have=sh.hats.includes(k), on=sh.hat===k;
+      return item(`<svg viewBox="0 0 40 40" width="26" height="26"><path d="M6 30 L21 4 L34 28 Q20 34 6 30z" fill="${v.c}" stroke="#e7c37a" stroke-width="1.5"/></svg>`,v.name,on?"쓰고 있어요":have?"가지고 있어요":"모리 모자 색 바꾸기",
+        `<button class="price${on?" on":have?" own":""}" data-hat="${k}" ${on?"disabled":""}>${on?"착용 중":have?"쓰기":v.price}</button>`); }).join("")+
+    Object.entries(ACCS).map(([k,v])=>{ const have=sh.accs.includes(k), on=!!w[k];
+      return item(k==="scarf"?"〰":k==="band"?"합":"✧",v.name,k==="band"?"수능 시즌 한정 꾸미기":on?"하고 있어요":have?"가지고 있어요":"모리에게 달아 주기",
+        `<button class="price${on?" on":have?" own":""}" data-acc="${k}">${on?"빼기":have?"하기":v.price}</button>`); }).join("");
+  // 이벤트
+  document.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.buy;
+    if(k==="draw") confirmBuy("뽑기 1번을 살까요?",PRICE.draw,()=>{ S.draws++; toast("뽑기 1번 충전!"); });
+    else confirmBuy("에픽 이상 확정권을 살까요?",PRICE.ticket,()=>{ S.tickets++; toast("확정권 1장 획득! 뽑기 화면에서 쓸 수 있어요"); });
+  });
+  document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.back;
+    const use=()=>{ sh.back=k; save(); applyBack(); renderShop(); };
+    if(sh.backs.includes(k)) { use(); toast(`${BACKS[k].name} 뒷면으로 바꿨어요`); }
+    else confirmBuy(`${BACKS[k].name} 뒷면을 살까요?`,BACKS[k].price,()=>{ sh.backs.push(k); sh.back=k; applyBack(); toast(`${BACKS[k].name} 뒷면을 샀어요!`); });
+  });
+  document.querySelectorAll("[data-hat]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.hat;
+    if(sh.hats.includes(k)){ sh.hat=k; save(); updateMori(); renderShop(); say("새 모자 어때? 잘 어울리지?"); }
+    else confirmBuy(`${HATS[k].name}를 살까요?`,HATS[k].price,()=>{ sh.hats.push(k); sh.hat=k; updateMori(); say("새 모자 고마워! 마음에 쏙 들어!"); });
+  });
+  document.querySelectorAll("[data-acc]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.acc; sh.wear=sh.wear||{};
+    if(sh.accs.includes(k)){ sh.wear[k]=!sh.wear[k]; save(); updateMori(); renderShop(); }
+    else confirmBuy(`${ACCS[k].name}를 살까요?`,ACCS[k].price,()=>{ sh.accs.push(k); sh.wear[k]=true; updateMori(); say(k==="band"?"합격 머리띠 장착! 시험 보는 모두를 응원할게!":"고마워! 멋지지?"); });
+  });
+}
+["n","r","e"].forEach(k=>$("ex-"+k).onclick=()=>{ exRank=k; renderShop(); });
+
+function setupAds(){
+  if(!AD_CODE.trim()||window.claude) return;  // claude.ai 안에서는 광고를 띄울 수 없어요
+  ["ad1","ad2"].forEach(id=>{ const el=$(id); el.innerHTML=AD_CODE; el.hidden=false;
+    el.querySelectorAll("script").forEach(old=>{ const sc=document.createElement("script"); [...old.attributes].forEach(a=>sc.setAttribute(a.name,a.value)); sc.textContent=old.textContent; old.replaceWith(sc); }); });
+}
+setupAds();
+load(); S.shop=Object.assign(FRESH().shop,S.shop||{}); applyBack(); updateMori(); refresh(); setTimeout(attendance,600);
+// 처음 열었을 때 카드 더미를 미리 펼쳐 둠
+if(S.draws>0){ deal(); } say("고민을 하나 떠올리고 카드를 골라 봐. 아주 가끔 빛나는 카드가 나온다구!");
+</script>
+</body>
+</html>
