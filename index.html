@@ -66,10 +66,10 @@ h1{font-family:var(--display);font-size:22px;margin:0;color:var(--gold);letter-s
 
 /* 무대 */
 .stage{position:relative;min-height:330px;display:grid;place-items:center;padding-bottom:44px}
-.fan{position:relative;width:100%;height:220px}
-.back{position:absolute;left:50%;bottom:0;width:86px;height:136px;margin-left:-43px;border-radius:9px;border:0;padding:0;
+.fan{position:relative;width:100%;height:310px}
+.back{position:absolute;left:50%;bottom:0;width:72px;height:114px;margin-left:-36px;border-radius:9px;border:0;padding:0;
   background:var(--back) center/100% 100% no-repeat,var(--backbg,#151c42);
-  transform-origin:50% 160%;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s;box-shadow:0 6px 16px #0008;
+  transform-origin:50% 215%;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s;box-shadow:0 6px 16px #0008;
   --tx:0px;--ty:0px;--rot:0deg;--ry:0deg;--sc:1;--lift:0px;
   transform:translate(var(--tx),calc(var(--ty) + var(--lift))) rotate(var(--rot)) rotateY(var(--ry)) scale(var(--sc))}
 .back:hover,.back:focus-visible{--lift:-22px}
@@ -546,14 +546,16 @@ function setT(el,o){ for(const k in o) el.style.setProperty("--"+k,o[k]); }
 function deal(){
   $("result").hidden=true;
   const stage=$("stage"); stage.innerHTML='<div class="fan" id="fan"></div>';
-  const fan=$("fan"), n=7, cards=[];
+  const fan=$("fan"), n=22, cards=[];
   busy=true;
   for(let i=0;i<n;i++){
     const b=document.createElement("button"); b.className="back"; b.setAttribute("aria-label",`${i+1}번째 카드 고르기`);
     setT(b,{tx:"0px",ty:"0px",rot:"0deg",ry:"0deg",sc:1}); fan.appendChild(b); cards.push(b);
     b.onclick=()=>pick(b,fan);
   }
-  const fanOut=()=>cards.forEach((b,i)=>{ b.style.transitionDelay=`${i*40}ms`; setT(b,{tx:"0px",ty:"0px",rot:`${(i-(n-1)/2)*11}deg`}); });
+  // 22장을 두 줄 부채꼴로 펼침: 뒷줄 11장, 앞줄 11장
+  const fanOut=()=>cards.forEach((b,i)=>{ const row=i<11?0:1, j=i%11; b.style.transitionDelay=`${i*25}ms`;
+    setT(b,{tx:"0px",ty:row?"0px":"-92px",rot:`${(j-5)*8.4+(row?0:4.2)}deg`}); });
   if(RM()){ fanOut(); busy=false; }
   else {
     // 1) 사방으로 흩어졌다가 2) 한 덩어리로 모였다가 3) 한 번 더 섞고 4) 부채꼴로 펼침
@@ -566,7 +568,7 @@ function deal(){
     }));
   }
   picks=[];
-  say(mode==="three"?"카드를 섞었어. 과거, 현재, 미래 순서로 세 장을 골라 줘!":"카드를 잘 섞었어. 마음이 가는 한 장을 골라 봐!");
+  say(mode==="three"?"카드 22장을 펼쳤어. 과거, 현재, 미래 순서로 세 장을 골라 줘!":"카드 22장을 펼쳤어. 마음이 가는 한 장을 골라 봐!");
 }
 let picks=[];
 function pick(b,fan){
