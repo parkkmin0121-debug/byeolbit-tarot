@@ -278,6 +278,10 @@ h1{font-family:var(--display);font-size:22px;margin:0;color:var(--gold);letter-s
 .meter .num{font-family:var(--display);font-size:44px;color:#ff9fb8;font-variant-numeric:tabular-nums;line-height:1}
 .meter .bar{width:100%}
 .meter .bar i{background:linear-gradient(90deg,#ff9fb8,#ffd1dc)}
+/* 저장 안내 */
+.warn{background:#3a2a10;border:1px solid #e7c37a;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;display:flex;flex-direction:column;gap:8px}
+.warn[hidden]{display:none}
+.warn b{color:var(--gold)}
 /* 광고 칸 */
 .ad{min-height:60px;border-radius:10px;overflow:hidden;text-align:center;background:#0f1530;border:1px solid var(--line);padding:6px}
 .ad[hidden]{display:none}
@@ -330,6 +334,7 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30}
   <!-- 뽑기 화면 -->
   <section class="view" id="view-draw">
     <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="warn" id="storeWarn" hidden></div>
       <div class="guide">
         <div class="owl" id="owl" aria-hidden="true"></div>
         <div class="bubble"><small>점술사 부엉이 모리</small><span id="say">고민을 하나 떠올리고 카드를 섞어 봐. 아주 가끔 빛나는 카드가 나온다구!</span></div>
@@ -370,6 +375,9 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30}
       <div class="grid" id="seasonGrid"></div>
       <h3 class="sec-title">업적 배지 <span id="badgeCnt" style="font-size:13px;color:var(--muted)"></span></h3>
       <div class="badges" id="badges"></div>
+      <h3 class="sec-title">기록 옮기기</h3>
+      <p class="shop-note">다른 휴대폰이나 브라우저로 옮길 때, 또는 기록이 사라질까 걱정될 때 기록 코드를 복사해 두세요.</p>
+      <div class="row"><button class="btn" id="exportBtn">내 기록 코드 복사</button><button class="btn ghost" id="importBtn">코드로 불러오기</button></div>
       <button class="btn ghost" id="reset" style="align-self:center;font-size:13px;padding:8px 14px">도감 처음부터 다시 하기</button>
     </div>
   </section>
@@ -469,6 +477,11 @@ const AD_CODE=``;
 const FRESH=()=>({col:{}, dust:0, draws:MAX_DRAWS, day:"", tickets:0, pity:0, total:0, fused:0, badges:{}, att:{last:"",streak:0}, shop:{backs:["basic"],back:"basic",hats:["blue"],hat:"blue",accs:[],wear:{}}});
 let S = FRESH();
 const today=()=>new Date().toLocaleDateString("ko-KR");
+// ---- 기록 저장이 되는 브라우저인지 확인 ----
+const STORE_OK=(()=>{ try{ const k="__t"+Date.now(); localStorage.setItem(k,"1"); const ok=localStorage.getItem(k)==="1"; localStorage.removeItem(k); return ok; }catch(e){ return false; } })();
+const UA=navigator.userAgent||"";
+const INAPP=/KAKAOTALK|Instagram|FBAN|FBAV|NAVER\(inapp|Line\/|everytimeApp|DaumApps/i.test(UA);
+const IS_KAKAO=/KAKAOTALK/i.test(UA);
 function load(){try{const s=JSON.parse(localStorage.getItem("starTarot")||"null");if(s)S=Object.assign(FRESH(),s);}catch(e){} if(S.day!==today()){S.day=today();S.draws=MAX_DRAWS;} save();}
 function save(){try{localStorage.setItem("starTarot",JSON.stringify(S));}catch(e){}}
 
@@ -1152,6 +1165,7 @@ function renderBadges(){
 
 // ---- 출석 체크 ----
 function attendance(){
+  if(!STORE_OK) return;  // 기록이 저장되지 않으면 출석을 셀 수 없어요
   const t=dayKey(), y=dayKey(new Date(Date.now()-864e5));
   if(S.att.last===t) return;
   let st=S.att.last===y?S.att.streak+1:1; if(st>7) st=1;
@@ -1283,8 +1297,44 @@ function setupAds(){
   ["ad1","ad2"].forEach(id=>{ const el=$(id); el.innerHTML=AD_CODE; el.hidden=false;
     el.querySelectorAll("script").forEach(old=>{ const sc=document.createElement("script"); [...old.attributes].forEach(a=>sc.setAttribute(a.name,a.value)); sc.textContent=old.textContent; old.replaceWith(sc); }); });
 }
+function storeBanner(){
+  const w=$("storeWarn"); let html="";
+  if(!STORE_OK){
+    html=`<span><b>지금 이 화면에서는 기록이 저장되지 않아요.</b> 나갔다 들어오면 카드와 출석이 처음부터 다시 시작돼요.</span>
+      <span>${window.claude?"아래 사이트 주소로 들어가면 기록이 저장돼요: <b>byeolbit-tarot77.netlify.app</b>":INAPP?"오른쪽 위 메뉴(⋮ 또는 ···)에서 <b>다른 브라우저로 열기</b>를 눌러 크롬이나 사파리로 열어 주세요.":"시크릿(비공개) 모드라면 일반 모드로 열어 주세요."}</span>`;
+  } else if(INAPP){
+    html=`<span><b>카카오톡·인스타그램 같은 앱 안에서 열면 기록이 사라질 수 있어요.</b> 크롬이나 사파리로 열면 출석과 카드가 안전하게 저장돼요.</span>
+      <span>오른쪽 위 메뉴(⋮ 또는 ···)에서 <b>다른 브라우저로 열기</b>를 눌러 주세요.</span>`;
+  }
+  if(html&&IS_KAKAO) html+=`<button class="btn" id="openExt" style="align-self:flex-start;font-size:13px;padding:8px 12px">크롬·사파리로 열기</button>`;
+  if(!html) return;
+  w.innerHTML=html+`<button class="more-btn" id="warnClose" style="align-self:flex-end;font-size:12px">닫기</button>`; w.hidden=false;
+  $("warnClose").onclick=()=>w.hidden=true;
+  if($("openExt")) $("openExt").onclick=()=>{ location.href="kakaotalk://web/openExternal?url="+encodeURIComponent(location.href); };
+}
+// 기록 코드 (내보내기 / 불러오기)
+function encodeSave(){ return "STAR1-"+btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
+function decodeSave(code){ code=code.trim().replace(/\s+/g,""); if(!code.startsWith("STAR1-")) throw 0; return JSON.parse(decodeURIComponent(escape(atob(code.slice(6))))); }
+$("exportBtn").onclick=async()=>{
+  const code=encodeSave();
+  $("sheet").innerHTML=`<h3>내 기록 코드</h3><p style="font-size:13px;color:var(--muted)">이 코드를 메모장이나 카톡 나에게 보내기에 저장해 두세요. 다른 곳에서 <b>코드로 불러오기</b>를 누르고 붙여 넣으면 기록이 그대로 옮겨져요.</p>
+    <textarea id="codeBox" readonly style="width:100%;height:110px;background:#0f1530;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:11px;word-break:break-all">${code}</textarea>
+    <div class="row"><button class="btn" id="copyCode">복사하기</button><button class="btn ghost" id="close">닫기</button></div>`;
+  $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true;
+  $("copyCode").onclick=async()=>{ try{ await navigator.clipboard.writeText(code); toast("복사했어요!"); }catch(e){ $("codeBox").select(); toast("코드를 길게 눌러 복사해 주세요"); } };
+};
+$("importBtn").onclick=()=>{
+  $("sheet").innerHTML=`<h3>코드로 불러오기</h3><label for="codeIn" style="font-size:13px;color:var(--muted)">저장해 둔 기록 코드를 붙여 넣으세요. 지금 기록은 코드의 기록으로 바뀌어요.</label>
+    <textarea id="codeIn" style="width:100%;height:110px;background:#0f1530;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:11px"></textarea>
+    <div class="row"><button class="btn" id="doImport">불러오기</button><button class="btn ghost" id="close">취소</button></div>`;
+  $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true;
+  $("doImport").onclick=()=>{
+    try{ const d=decodeSave($("codeIn").value); S=Object.assign(FRESH(),d); S.shop=Object.assign(FRESH().shop,S.shop||{}); save(); applyBack(); updateMori(); refresh(); $("modal").hidden=true; toast("기록을 불러왔어요!"); burst("#e7c37a",60); }
+    catch(e){ toast("코드가 올바르지 않아요. 다시 확인해 주세요"); }
+  };
+};
 setupAds();
-load(); S.shop=Object.assign(FRESH().shop,S.shop||{}); applyBack(); updateMori(); refresh(); setTimeout(attendance,600);
+load(); S.shop=Object.assign(FRESH().shop,S.shop||{}); applyBack(); updateMori(); refresh(); storeBanner(); setTimeout(attendance,600);
 // 처음 열었을 때 카드 더미를 미리 펼쳐 둠
 if(S.draws>0){ deal(); } say("고민을 하나 떠올리고 카드를 골라 봐. 아주 가끔 빛나는 카드가 나온다구!");
 </script>
