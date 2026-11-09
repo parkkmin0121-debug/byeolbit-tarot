@@ -278,6 +278,19 @@ h1{font-family:var(--display);font-size:22px;margin:0;color:var(--gold);letter-s
 .meter .num{font-family:var(--display);font-size:44px;color:#ff9fb8;font-variant-numeric:tabular-nums;line-height:1}
 .meter .bar{width:100%}
 .meter .bar i{background:linear-gradient(90deg,#ff9fb8,#ffd1dc)}
+/* 사용법 안내 */
+.tut{display:flex;flex-direction:column;gap:12px;text-align:center}
+.tut .pic{height:130px;display:grid;place-items:center}
+.tut h3{font-size:19px}
+.tut p{font-size:14px;line-height:1.7;text-align:left}
+.tut .tdots{display:flex;gap:6px;justify-content:center}
+.tut .tdots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.tut .tdots i.on{background:var(--gold);width:18px;border-radius:4px}
+.tut .nav{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tut .skip{background:none;border:0;color:var(--muted);font-size:12px;text-decoration:underline}
+.mini-back{width:56px;height:88px;border-radius:7px;background:var(--back) center/100% 100% no-repeat,var(--backbg,#151c42);box-shadow:0 4px 12px #0008;display:inline-block}
+.rk-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.rk-row span{font-size:12px;border:1px solid currentColor;border-radius:99px;padding:3px 9px}
 /* 저장 안내 */
 .warn{background:#3a2a10;border:1px solid #e7c37a;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;display:flex;flex-direction:column;gap:8px}
 .warn[hidden]{display:none}
@@ -319,6 +332,7 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30}
   <header>
     <h1 id="title" style="cursor:default;user-select:none">별빛 타로 도감</h1>
     <div class="wallet">
+      <button class="chip" id="helpBtn" style="color:inherit;font:inherit;font-size:13px;cursor:pointer" aria-label="사용 방법 보기">사용법</button>
       <span class="chip">뽑기 <b id="draws">5</b></span>
       <button class="chip" id="dustChip" style="color:inherit;font:inherit;font-size:13px;cursor:pointer" aria-label="별가루 상점 열기">별가루 <b id="dust">0</b></button>
     </div>
@@ -1327,8 +1341,42 @@ $("importBtn").onclick=()=>{
     catch(e){ toast("코드가 올바르지 않아요. 다시 확인해 주세요"); }
   };
 };
+// ---- 처음 온 사람을 위한 사용법 안내 ----
+const TUT=[
+ {t:"별빛 타로 도감에 온 걸 환영해!",pic:()=>`<div style="width:110px;height:110px">${MORI_SVG}</div>`,
+  p:"나는 점술사 부엉이 <b>모리</b>야. 여기서는 고민을 적고 타로 카드를 뽑으면 내가 풀이해 줘. 뽑은 카드는 <b>도감</b>에 모여서, 포켓몬 카드처럼 모으는 재미도 있어!"},
+ {t:"1. 고민을 적고 카드를 골라",pic:()=>`<div style="display:flex;gap:4px;transform:rotate(-4deg)"><span class="mini-back" style="transform:rotate(-12deg)"></span><span class="mini-back" style="transform:translateY(-14px)"></span><span class="mini-back" style="transform:rotate(12deg)"></span></div>`,
+  p:"<b>카드 뽑기</b> 화면에서 고민을 적어 줘. 안 적어도 괜찮아. 그다음 펼쳐진 22장 중에서 <b>마음이 가는 카드 한 장</b>을 눌러. 카드는 <b>하루에 2번</b> 뽑을 수 있어."},
+ {t:"2. 카드를 뒤집고 풀이를 읽어",pic:()=>`<div style="width:74px;height:118px">${cardHTML(CARDS[19])}</div>`,
+  p:"큰 카드가 나오면 <b>눌러서 뒤집거나 위로 쓸어 올려</b>. 그럼 고민에 맞춘 풀이가 나와. 더 알고 싶으면 <b>자세히 보기</b>를 누르고, 친구에게 자랑하고 싶으면 <b>공유 이미지 만들기</b>를 눌러!"},
+ {t:"3. 희귀한 카드를 모아 봐",pic:()=>`<div class="rk-row"><span style="color:var(--r-n)">일반 60%</span><span style="color:var(--r-r)">레어 28%</span><span style="color:var(--r-e)">에픽 10%</span><span style="color:var(--r-l)">전설 2%</span><span style="color:#5ff2c6">한정</span></div>`,
+  p:"카드에는 <b>희귀도</b>가 있어. 전설 카드는 아주 귀해서 뒤집기 전부터 카드가 금빛으로 떨려! 계속 안 나와도 걱정 마. <b>50번 안에 전설 한 장은 꼭</b> 나와. 새 카드는 <b>내 도감</b>에 차곡차곡 모여."},
+ {t:"4. 별가루로 상점을 이용해",pic:()=>`<div style="font-size:44px;color:var(--gold)">✦</div>`,
+  p:"이미 있는 카드가 또 나오면 <b>별가루</b>로 바뀌어. 매일 처음 들어와도 별가루를 줘. 별가루는 <b>상점</b>에서 뽑기, 원하는 카드 교환, 카드 뒷면 바꾸기, 모리 꾸미기에 쓸 수 있어."},
+ {t:"5. 이것도 해 봐!",pic:()=>`<div style="font-size:40px;color:#ff9fb8">♥</div>`,
+  p:"• <b>과거·현재·미래</b>: 카드 3장으로 흐름을 봐 (뽑기 2번 사용)<br>• <b>궁합</b>: 두 사람 이름으로 궁합 점수를 봐 (무료)<br>• 기록이 걱정되면 <b>내 도감 → 내 기록 코드 복사</b>로 저장해 둬<br><br>사용법은 언제든 위의 <b>사용법</b> 버튼으로 다시 볼 수 있어. 그럼 시작해 볼까?"}
+];
+function showTutorial(i=0,onDone){
+  const T=TUT[i], last=i===TUT.length-1;
+  $("sheet").innerHTML=`<div class="tut">
+    <div class="pic" aria-hidden="true">${T.pic()}</div>
+    <h3>${T.t}</h3><p>${T.p}</p>
+    <div class="tdots" aria-label="${i+1} / ${TUT.length}">${TUT.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("")}</div>
+    <div class="nav">${i>0?`<button class="btn ghost" id="tPrev">이전</button>`:`<span></span>`}<button class="btn" id="tNext">${last?"시작하기":"다음"}</button></div>
+    ${last?"":`<button class="skip" id="tSkip">건너뛰기</button>`}
+  </div>`;
+  $("modal").hidden=false;
+  const finish=()=>{ $("modal").hidden=true; S.tut=true; save(); if(onDone) onDone(); };
+  $("tNext").onclick=()=> last?finish():showTutorial(i+1,onDone);
+  if($("tPrev")) $("tPrev").onclick=()=>showTutorial(i-1,onDone);
+  if($("tSkip")) $("tSkip").onclick=finish;
+  $("tNext").focus();
+}
+$("helpBtn").onclick=()=>showTutorial(0);
+
 setupAds();
-load(); S.shop=Object.assign(FRESH().shop,S.shop||{}); applyBack(); updateMori(); refresh(); storeBanner(); setTimeout(attendance,600);
+load(); S.shop=Object.assign(FRESH().shop,S.shop||{}); applyBack(); updateMori(); refresh(); storeBanner();
+if(!S.tut) setTimeout(()=>showTutorial(0,()=>setTimeout(attendance,300)),500); else setTimeout(attendance,600);
 // 처음 열었을 때 카드 더미를 미리 펼쳐 둠
 if(S.draws>0){ deal(); } say("고민을 하나 떠올리고 카드를 골라 봐. 아주 가끔 빛나는 카드가 나온다구!");
 </script>
