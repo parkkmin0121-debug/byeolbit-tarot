@@ -419,6 +419,7 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30}
 <div class="toast" id="toast" hidden></div>
 <canvas id="fx"></canvas>
 <script src="art.js"></script>
+<script src="reading.js"></script>
 <script>
 const RANK = {
   n:{name:"일반", en:"COMMON", w:60, dust:1, color:"#a9b3c9"},
@@ -534,7 +535,7 @@ $("shuffle").onclick=()=>{
   } else if(!useTicket&&S.draws<=0){ if(S.dust<DUST_COST)return; S.dust-=DUST_COST; S.draws+=1; save(); refresh(); }
   deal();
 };
-function setMode(m){ if(busy) return; mode=m; $("m-one").setAttribute("aria-checked",m==="one"); $("m-three").setAttribute("aria-checked",m==="three");
+function setMode(m){ if(busy&&document.querySelector(".back.chosen, .back.taken, #big:not(.flipped)")) return; busy=false; mode=m; $("m-one").setAttribute("aria-checked",m==="one"); $("m-three").setAttribute("aria-checked",m==="three");
   if(m==="three") useTicket=false; refresh();
   say(m==="three"?"과거, 현재, 미래를 한 장씩 보는 방법이야. 카드 세 장을 차례로 골라 줘!":"고민을 하나 떠올리고 카드를 골라 봐.");
   if(S.draws>0||m==="three") deal(); }
@@ -681,6 +682,7 @@ const TOPICS=[
   {k:["건강","아파","운동","잠"],t:"몸과 마음"}
 ];
 function fallbackReading(q,card,rev){
+  if(window.TAROT_READING) return window.TAROT_READING.localReading(q,card,rev);
   const hit=TOPICS.find(x=>x.k.some(w=>q.includes(w)));
   const topic=hit?hit.t:"이 고민";
   const tone=rev?"조금 조심하라는 신호야.":"좋은 방향을 가리키고 있어.";
@@ -691,7 +693,7 @@ async function readForQuestion(q,card,rev){
   const show=(sh,dt)=>{ if(!sum.isConnected)return;
     if(sh){ sum.classList.remove("wait"); sum.textContent=sh; }
     if(det&&dt){ det.classList.remove("wait"); det.textContent=dt; } };
-  const fb=()=>{ const f=fallbackReading(q,card,rev); show(f.short,null); if(det&&det.isConnected) det.remove(); };
+  const fb=()=>{ const f=fallbackReading(q,card,rev); show(f.short,f.detail); if(!f.detail&&det&&det.isConnected) det.remove(); };
   const sample=await getSampler();
   if(!sample){ fb(); return; }
   const prompt=`너는 타로 앱의 귀여운 점술사 부엉이 '모리'야. 친근한 반말로, 학생도 쉽게 이해할 수 있게 말해.
@@ -1101,7 +1103,8 @@ ${desc}
 요약: 세 카드가 이어지는 흐름을 4~5문장, 180~220자 정도로. 과거에서 현재를 거쳐 미래로 어떻게 이어지는지와 응원 한마디까지.
 자세히: 카드마다 고민과 연결해서 두 문장씩 풀어 주고, 마지막에 오늘 해 볼 작은 행동 하나를 추천해. 5~7문장.
 겁주거나 단정하지 말고 따뜻하게. 인사말, 이모지, 따옴표 없이.`;
-  const fb={short:`${sum}. ${res[0].card.key}에서 시작해서 지금은 ${res[1].card.key}의 시기를 지나고 있고, 앞으로는 ${res[2].card.key}이(가) 기다리고 있어. ${res[2].rev?"조금 조심하면서 천천히 가면 괜찮아.":"좋은 방향으로 흘러가고 있으니 자신 있게 가 봐!"}`, detail:null};
+  const SL=window.TAROT_READING?window.TAROT_READING.spreadLines(q,res):null;
+  const fb={detail:SL?res.map((x,i)=>`${POS[i]}의 ${x.card.name}: ${SL.lines[i]}`).join(" "):null, short:(SL&&q?SL.open+" ":"")+`${sum}. ${res[0].card.key}에서 시작해서 지금은 ${res[1].card.key}의 시기를 지나고 있고, 앞으로는 ${window.TAROT_READING?window.TAROT_READING.josa(res[2].card.key,"이/가"):res[2].card.key+"이(가)"} 기다리고 있어. ${res[2].rev?"조금 조심하면서 천천히 가면 괜찮아.":"좋은 방향으로 흘러가고 있으니 자신 있게 가 봐!"}`};
   aiRead(prompt,$("summary"),$("detail"),fb);
   lastRes=res[1];
 }
