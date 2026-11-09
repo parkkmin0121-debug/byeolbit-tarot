@@ -1148,7 +1148,6 @@ const BADGES=[
   {id:"holo",ic:"✦",name:"반짝반짝",desc:"에픽 이상 홀로 카드 3종류",ok:()=>CARDS.filter(c=>canHolo(c)&&S.col[c.id+"h"]).length>=3},
   {id:"fuse",ic:"⚗",name:"연금술사",desc:"카드 첫 합성",ok:()=>(S.fused||0)>=1},
   {id:"season",ic:"✎",name:"수능 응원단",desc:"한정 '합격의 별' 얻기",ok:()=>owned(22)},
-  {id:"streak",ic:"7",name:"7일 개근",desc:"7일 연속 출석",ok:()=>S.att&&S.att.streak>=7},
   {id:"hundred",ic:"百",name:"백 번의 운명",desc:"카드 100번 뽑기",ok:()=>(S.total||0)>=100},
   {id:"complete",ic:"♾",name:"도감 완성",desc:"22장 모두 모으기",ok:()=>BASE.every(c=>owned(c.id))}
 ];
@@ -1160,23 +1159,18 @@ function checkBadges(){
 function renderBadges(){
   const el=$("badges"); if(!el) return;
   el.innerHTML=BADGES.map(b=>`<div class="badge${S.badges[b.id]?" on":""}"><i aria-hidden="true">${b.ic}</i><span><b>${b.name}</b><small>${b.desc}</small></span></div>`).join("");
-  $("badgeCnt").textContent=`${Object.keys(S.badges).length} / ${BADGES.length}`;
+  $("badgeCnt").textContent=`${BADGES.filter(b=>S.badges[b.id]).length} / ${BADGES.length}`;
 }
 
 // ---- 출석 체크 ----
 function attendance(){
-  if(!STORE_OK) return;  // 기록이 저장되지 않으면 출석을 셀 수 없어요
-  const t=dayKey(), y=dayKey(new Date(Date.now()-864e5));
+  if(!STORE_OK) return;  // 기록이 저장되지 않으면 출석 보상을 줄 수 없어요
+  const t=dayKey();
   if(S.att.last===t) return;
-  let st=S.att.last===y?S.att.streak+1:1; if(st>7) st=1;
-  S.att={last:t,streak:st};
-  const reward=st===7?"에픽 이상 확정권 1장":`별가루 ${st===3||st===5?5:3}개`;
-  if(st===7) S.tickets++; else S.dust+=(st===3||st===5?5:3);
-  save(); refresh(); setTimeout(checkBadges,1200);
-  const days=[1,2,3,4,5,6,7].map(d=>`<div class="${d<=st?"done":""}${d===st?" today":""}${d===7?" big7":""}"><span>${d===7?"★":d}</span>${d===7?"확정권":(d===3||d===5?"별가루5":"별가루3")}</div>`).join("");
-  $("sheet").innerHTML=`<h3>출석 ${st}일째!</h3><p>오늘의 출석 보상으로 <b style="color:var(--gold)">${reward}</b>을(를) 받았어요.</p>
-    <div class="att">${days}</div>
-    <p style="color:var(--muted);font-size:12px">하루라도 빠지면 1일째부터 다시 시작해요. 7일째에는 에픽 이상 확정권을 줘요!</p>
+  S.att={last:t,streak:0};
+  S.dust+=5; save(); refresh();
+  $("sheet").innerHTML=`<h3>오늘의 출석 보상</h3><p>오늘도 와 줘서 고마워! 별가루 <b style="color:var(--gold)">5개</b>를 받았어요.</p>
+    <p style="color:var(--muted);font-size:12px">하루에 한 번, 들어올 때마다 별가루를 받을 수 있어요.</p>
     <button class="btn" id="close">좋아요</button>`;
   $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true;
 }
