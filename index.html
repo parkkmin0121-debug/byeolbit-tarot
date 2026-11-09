@@ -905,22 +905,70 @@ const MORI_BASE=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
  <circle cx="33" cy="84" r="4" fill="#ff9fb8" opacity=".55"/><circle cx="87" cy="84" r="4" fill="#ff9fb8" opacity=".55"/>
  <path d="M55 80 h10 l-5 8z" fill="#f0a534"/>
  <path d="M50 116 l3 -5 l3 5 M64 116 l3 -5 l3 5" stroke="#f0a534" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+ <g id="hat">
  <path d="M28 48 L64 4 L94 44 Q61 54 28 48z" fill="#2b3a8a" stroke="#e7c37a" stroke-width="1.6"/>
  <path d="M64 4 q6 -2 9 4" stroke="#e7c37a" stroke-width="1.6" fill="none"/><circle cx="74" cy="9" r="3" fill="#e7c37a"/>
  <ellipse cx="61" cy="48" rx="40" ry="7" fill="#24306f" stroke="#e7c37a" stroke-width="1.6"/>
  <path d="M62 18 l2.4 5.2 5.6 .6 -4.2 3.8 1.2 5.6 -5 -2.9 -5 2.9 1.2 -5.6 -4.2 -3.8 5.6 -.6z" fill="#e7c37a"/>
  <circle cx="46" cy="34" r="1.6" fill="#e7c37a"/><circle cx="78" cy="30" r="1.3" fill="#e7c37a"/>
+ </g>
 </svg>`;
-const HATS={blue:{name:"파란 모자",c:"#2b3a8a",b:"#24306f",price:0},red:{name:"빨간 모자",c:"#a3243a",b:"#7d1a2c",price:40},green:{name:"초록 모자",c:"#1f7a52",b:"#165c3d",price:40},pink:{name:"분홍 모자",c:"#d9609a",b:"#b04479",price:40}};
-const ACCS={scarf:{name:"빨간 목도리",price:40},band:{name:"수능 응원 머리띠",price:40},glasses:{name:"반짝 별 안경테",price:40}};
+// 모자: 한 번에 하나만 쓸 수 있어요
+const HATS={
+  blue:{name:"파란 마법사 모자",desc:"모리의 기본 모자",price:0,
+    icon:`<path d="M6 30 L21 4 L34 28 Q20 34 6 30z" fill="#2b3a8a" stroke="#e7c37a" stroke-width="1.5"/>`},
+  crown:{name:"황금 왕관",desc:"보석이 박힌 반짝이는 왕관",price:60,
+    icon:`<path d="M6 30 L8 12 L14 20 L20 8 L26 20 L32 12 L34 30Z" fill="#ffd25a" stroke="#a8721a" stroke-width="1.5"/><circle cx="20" cy="24" r="2.5" fill="#e0304a"/>`,
+    svg:`<path d="M32 52 L35 24 L47 38 L61 16 L75 38 L87 24 L90 52Z" fill="#ffd25a" stroke="#a8721a" stroke-width="1.8" stroke-linejoin="round"/>
+      <rect x="32" y="46" width="58" height="8" rx="2" fill="#f0b830" stroke="#a8721a" stroke-width="1.5"/>
+      <circle cx="35" cy="23" r="3" fill="#fff3c4"/><circle cx="61" cy="15" r="3.5" fill="#fff3c4"/><circle cx="87" cy="23" r="3" fill="#fff3c4"/>
+      <circle cx="61" cy="40" r="4.5" fill="#e0304a" stroke="#fff3c4" stroke-width="1"/><circle cx="46" cy="50" r="2.6" fill="#3fa0ff"/><circle cx="76" cy="50" r="2.6" fill="#3fa0ff"/>
+      <path d="M52 30 l2 -6 M70 30 l-2 -6" stroke="#fff8d0" stroke-width="1.4" stroke-linecap="round"/>`},
+  santa:{name:"산타 모자",desc:"겨울에 딱 맞는 폭신한 모자",price:50,
+    icon:`<path d="M6 30 Q12 6 28 8 Q36 10 34 24 L30 24 Q28 16 22 16 Q16 22 30 30Z" fill="#d6283a"/><rect x="4" y="27" width="28" height="7" rx="3.5" fill="#fff"/><circle cx="33" cy="25" r="4" fill="#fff"/>`,
+    svg:`<path d="M26 50 Q36 8 74 10 Q102 12 104 44 L95 46 Q92 26 76 24 Q60 26 96 50Z" fill="#d6283a" stroke="#a51a2a" stroke-width="1.2"/>
+      <path d="M40 30 Q58 16 78 18" stroke="#ff6a7a" stroke-width="2" fill="none" opacity=".7"/>
+      <rect x="22" y="43" width="78" height="13" rx="6.5" fill="#fff" stroke="#e6e6e6" stroke-width="1"/>
+      <circle cx="102" cy="47" r="8" fill="#fff" stroke="#e6e6e6" stroke-width="1"/>`},
+  grad:{name:"학사모",desc:"공부 잘하는 모리가 되는 모자",price:50,
+    icon:`<path d="M20 8 L38 16 L20 24 L2 16Z" fill="#23233a" stroke="#e7c37a" stroke-width="1"/><path d="M10 20 L10 28 Q20 32 30 28 L30 20" fill="#2c2c46"/><path d="M20 16 L34 20 L34 30" stroke="#ffd25a" stroke-width="1.5" fill="none"/>`,
+    svg:`<path d="M36 40 L36 52 Q61 60 86 52 L86 40Z" fill="#2c2c46" stroke="#14142a" stroke-width="1.2"/>
+      <path d="M61 18 L106 32 L61 46 L16 32Z" fill="#23233a" stroke="#14142a" stroke-width="1.2"/>
+      <path d="M61 22 L98 33" stroke="#3a3a5a" stroke-width="1" fill="none"/>
+      <circle cx="61" cy="32" r="3" fill="#ffd25a"/>
+      <path d="M61 32 L98 40 L98 60" stroke="#ffd25a" stroke-width="2" fill="none"/>
+      <path d="M95 60 l3 10 l3 -10z" fill="#ffd25a"/>`}
+};
+// 꾸미기 소품: 여러 개를 함께 할 수 있어요
+const ACCS={
+  scarf:{name:"빨간 목도리",desc:"따뜻한 겨울 목도리",price:40,ic:"〰"},
+  band:{name:"수능 응원 머리띠",desc:"수능 시즌 한정 꾸미기",price:40,ic:"합"},
+  glasses:{name:"반짝 별 안경테",desc:"안경테가 분홍빛으로 반짝여요",price:40,ic:"✧"},
+  ball:{name:"수정 구슬",desc:"점술사의 필수품, 보랏빛 구슬",price:50,ic:"◉"},
+  bow:{name:"나비넥타이",desc:"멋쟁이 모리가 되는 리본",price:30,ic:"⋈"},
+  wand:{name:"별 지팡이",desc:"끝에 별이 달린 마법 지팡이",price:50,ic:"✦"}
+};
+const OLD_HATS=["red","green","pink"];
 function moriSVG(){
-  const sh=S.shop||{}; const H=HATS[sh.hat]||HATS.blue, w=sh.wear||{};
-  let m=MORI_BASE.split("#2b3a8a").join(H.c).split("#24306f").join(H.b);
+  const sh=S.shop||{}; const hatK=HATS[sh.hat]?sh.hat:"blue", w=sh.wear||{};
+  let m=MORI_BASE;
+  if(hatK!=="blue") m=m.replace(/<g id="hat">[\s\S]*?<\/g>/,"");
   if(w.glasses) m=m.split('stroke="#e7c37a" stroke-width="2.6"').join('stroke="#ff9be8" stroke-width="3.2"');
   let add="";
+  if(w.wand) add+=`<path d="M94 104 L113 70" stroke="#8a5a2a" stroke-width="3.2" stroke-linecap="round"/><path d="M113 60 l2.6 5.4 5.8 .7 -4.3 4 1.2 5.8 -5.3 -3 -5.3 3 1.2 -5.8 -4.3 -4 5.8 -.7z" fill="#ffd25a" stroke="#c98b1e" stroke-width=".8"/><circle cx="104" cy="62" r="1.3" fill="#fff6c8"/><circle cx="118" cy="80" r="1.1" fill="#fff6c8"/>`;
   if(w.scarf) add+=`<path d="M30 94 Q60 108 90 94 L92 102 Q60 118 28 102Z" fill="#d8344c"/><path d="M76 100 l8 20 l-9 -2 l-5 -16z" fill="#b8263c"/><path d="M36 99 Q60 110 84 99" stroke="#ffd3d9" stroke-width="2" fill="none" stroke-dasharray="3 4"/>`;
+  if(w.bow) add+=`<path d="M60 93 L47 86 L47 100Z" fill="#3a5bd9" stroke="#1f3a9a" stroke-width="1"/><path d="M60 93 L73 86 L73 100Z" fill="#3a5bd9" stroke="#1f3a9a" stroke-width="1"/><circle cx="60" cy="93" r="3.5" fill="#ffd25a"/>`;
+  if(w.ball) add+=`<defs><radialGradient id="cb" cx="35%" cy="30%"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#d9c2ff"/><stop offset="1" stop-color="#6b3fc8"/></radialGradient></defs><ellipse cx="60" cy="117" rx="15" ry="3.5" fill="#c98b1e"/><path d="M48 116 Q60 108 72 116Z" fill="#e7b84a"/><circle cx="60" cy="104" r="12" fill="url(#cb)" stroke="#b89cff" stroke-width="1"/><circle cx="56" cy="100" r="2.5" fill="#fff" opacity=".8"/>`;
+  if(hatK!=="blue") add+=HATS[hatK].svg;
   if(w.band) add+=`<path d="M22 47 Q61 57 100 47 L101 56 Q61 66 21 56Z" fill="#fff" stroke="#e8e8e8" stroke-width="1"/><circle cx="61" cy="56" r="6.5" fill="#e03a3a"/><text x="61" y="59" font-size="6" font-weight="700" fill="#fff" text-anchor="middle" font-family="sans-serif">합격</text><path d="M100 50 l10 -6 l-2 10z M100 53 l11 4 l-9 4z" fill="#fff" stroke="#e8e8e8" stroke-width=".8"/>`;
-  return m.replace("</svg>",add+"</svg>");
+  return m.replace(/<\/svg>\s*$/,add+"</svg>");
+}
+// 없어진 색깔 모자를 산 사람에게는 별가루를 돌려줘요
+function migrateHats(){
+  const sh=S.shop; if(!sh) return;
+  const old=(sh.hats||[]).filter(h=>OLD_HATS.includes(h));
+  if(old.length){ sh.hats=sh.hats.filter(h=>!OLD_HATS.includes(h)); S.dust+=old.length*40; save(); setTimeout(()=>toast(`색깔 모자가 사라져서 별가루 ${old.length*40}개를 돌려드렸어요`),2500); }
+  if(!HATS[sh.hat]) sh.hat="blue";
 }
 let MORI_SVG=MORI_BASE;
 function updateMori(){ MORI_SVG=moriSVG(); $("owl").innerHTML=MORI_SVG; $("owl2").innerHTML=MORI_SVG; }
@@ -1269,11 +1317,12 @@ function renderShop(){
   // 모리
   $("moriPrev").innerHTML=MORI_SVG;
   const w=sh.wear||{};
-  $("shopMori").innerHTML=Object.entries(HATS).map(([k,v])=>{ const have=sh.hats.includes(k), on=sh.hat===k;
-      return item(`<svg viewBox="0 0 40 40" width="26" height="26"><path d="M6 30 L21 4 L34 28 Q20 34 6 30z" fill="${v.c}" stroke="#e7c37a" stroke-width="1.5"/></svg>`,v.name,on?"쓰고 있어요":have?"가지고 있어요":"모리 모자 색 바꾸기",
+  $("shopMori").innerHTML=`<p class="shop-note" style="margin:8px 0 0">모자 (하나만 쓸 수 있어요)</p>`+Object.entries(HATS).map(([k,v])=>{ const have=sh.hats.includes(k), on=sh.hat===k;
+      return item(`<svg viewBox="0 0 40 40" width="28" height="28">${v.icon}</svg>`,v.name,on?"쓰고 있어요":have?"가지고 있어요":v.desc,
         `<button class="price${on?" on":have?" own":""}" data-hat="${k}" ${on?"disabled":""}>${on?"착용 중":have?"쓰기":v.price}</button>`); }).join("")+
+    `<p class="shop-note" style="margin:8px 0 0">소품 (여러 개를 함께 할 수 있어요)</p>`+
     Object.entries(ACCS).map(([k,v])=>{ const have=sh.accs.includes(k), on=!!w[k];
-      return item(k==="scarf"?"〰":k==="band"?"합":"✧",v.name,k==="band"?"수능 시즌 한정 꾸미기":on?"하고 있어요":have?"가지고 있어요":"모리에게 달아 주기",
+      return item(v.ic,v.name,on?"하고 있어요":have?"가지고 있어요":v.desc,
         `<button class="price${on?" on":have?" own":""}" data-acc="${k}">${on?"빼기":have?"하기":v.price}</button>`); }).join("");
   // 이벤트
   document.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{
@@ -1290,12 +1339,12 @@ function renderShop(){
   document.querySelectorAll("[data-hat]").forEach(b=>b.onclick=()=>{
     const k=b.dataset.hat;
     if(sh.hats.includes(k)){ sh.hat=k; save(); updateMori(); renderShop(); say("새 모자 어때? 잘 어울리지?"); }
-    else confirmBuy(`${HATS[k].name}를 살까요?`,HATS[k].price,()=>{ sh.hats.push(k); sh.hat=k; updateMori(); say("새 모자 고마워! 마음에 쏙 들어!"); });
+    else confirmBuy(`${HATS[k].name}${/[가-힣]$/.test(HATS[k].name)&&((HATS[k].name.charCodeAt(HATS[k].name.length-1)-0xAC00)%28)?"을":"를"} 살까요?`,HATS[k].price,()=>{ sh.hats.push(k); sh.hat=k; updateMori(); say("새 모자 고마워! 마음에 쏙 들어!"); });
   });
   document.querySelectorAll("[data-acc]").forEach(b=>b.onclick=()=>{
     const k=b.dataset.acc; sh.wear=sh.wear||{};
     if(sh.accs.includes(k)){ sh.wear[k]=!sh.wear[k]; save(); updateMori(); renderShop(); }
-    else confirmBuy(`${ACCS[k].name}를 살까요?`,ACCS[k].price,()=>{ sh.accs.push(k); sh.wear[k]=true; updateMori(); say(k==="band"?"합격 머리띠 장착! 시험 보는 모두를 응원할게!":"고마워! 멋지지?"); });
+    else confirmBuy(`${ACCS[k].name}${((ACCS[k].name.charCodeAt(ACCS[k].name.length-1)-0xAC00)%28)?"을":"를"} 살까요?`,ACCS[k].price,()=>{ sh.accs.push(k); sh.wear[k]=true; updateMori(); say(k==="band"?"합격 머리띠 장착! 시험 보는 모두를 응원할게!":k==="ball"?"수정 구슬이 있으니 더 잘 보일 것 같아!":k==="wand"?"별 지팡이로 행운을 불러 줄게!":"고마워! 멋지지?"); });
   });
 }
 ["n","r","e"].forEach(k=>$("ex-"+k).onclick=()=>{ exRank=k; renderShop(); });
@@ -1337,7 +1386,7 @@ $("importBtn").onclick=()=>{
     <div class="row"><button class="btn" id="doImport">불러오기</button><button class="btn ghost" id="close">취소</button></div>`;
   $("modal").hidden=false; $("close").onclick=()=>$("modal").hidden=true;
   $("doImport").onclick=()=>{
-    try{ const d=decodeSave($("codeIn").value); S=Object.assign(FRESH(),d); S.shop=Object.assign(FRESH().shop,S.shop||{}); save(); applyBack(); updateMori(); refresh(); $("modal").hidden=true; toast("기록을 불러왔어요!"); burst("#e7c37a",60); }
+    try{ const d=decodeSave($("codeIn").value); S=Object.assign(FRESH(),d); S.shop=Object.assign(FRESH().shop,S.shop||{}); migrateHats(); save(); applyBack(); updateMori(); refresh(); $("modal").hidden=true; toast("기록을 불러왔어요!"); burst("#e7c37a",60); }
     catch(e){ toast("코드가 올바르지 않아요. 다시 확인해 주세요"); }
   };
 };
@@ -1375,7 +1424,7 @@ function showTutorial(i=0,onDone){
 $("helpBtn").onclick=()=>showTutorial(0);
 
 setupAds();
-load(); S.shop=Object.assign(FRESH().shop,S.shop||{}); applyBack(); updateMori(); refresh(); storeBanner();
+load(); S.shop=Object.assign(FRESH().shop,S.shop||{}); migrateHats(); applyBack(); updateMori(); refresh(); storeBanner();
 if(!S.tut) setTimeout(()=>showTutorial(0,()=>setTimeout(attendance,300)),500); else setTimeout(attendance,600);
 // 처음 열었을 때 카드 더미를 미리 펼쳐 둠
 if(S.draws>0){ deal(); } say("고민을 하나 떠올리고 카드를 골라 봐. 아주 가끔 빛나는 카드가 나온다구!");
